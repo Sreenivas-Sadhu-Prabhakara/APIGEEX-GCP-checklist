@@ -3,457 +3,500 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apigee X Enterprise Deployment Checklist | GCP</title>
+    <title>Apigee X | Enterprise Blueprint</title>
     <style>
         :root {
-            --apple-blue: #0071e3;
-            --apple-bg: #f5f5f7;
-            --apple-card: #ffffff;
-            --apple-text: #1d1d1f;
-            --apple-text-secondary: #86868b;
-            --apple-border: #d2d2d7;
-            --apple-success: #28cd41;
-            --radius: 12px;
-            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --sf-blue: #0071e3;
+            --sf-bg: #f5f5f7;
+            --sf-card: rgba(255, 255, 255, 0.85);
+            --sf-text: #1d1d1f;
+            --sf-text-dim: #86868b;
+            --sf-border: rgba(210, 210, 215, 0.5);
+            --sf-success: #34c759;
+            --sf-warning: #ff9f0a;
+            --sf-error: #ff3b30;
+            --radius-lg: 18px;
+            --radius-md: 12px;
+            --glass: blur(25px) saturate(180%);
+            --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: var(--font-main);
-            background-color: var(--apple-bg);
-            color: var(--apple-text);
-            line-height: 1.5;
+            font-family: var(--font-stack);
+            background-color: var(--sf-bg);
+            color: var(--sf-text);
+            line-height: 1.47;
+            letter-spacing: -0.022em;
             -webkit-font-smoothing: antialiased;
-            padding-bottom: 100px;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px 100px;
         }
 
         header {
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             position: sticky;
             top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--apple-border);
-            padding: 20px 0;
+            background: rgba(245, 245, 247, 0.75);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            z-index: 1000;
+            border-bottom: 1px solid var(--sf-border);
+            padding: 16px 0;
+            margin-bottom: 40px;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header .container {
+        .nav-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-logo {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #0071e3, #40a9ff);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
         h1 {
-            font-size: 21px;
+            font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.01em;
         }
 
-        .progress-container {
-            flex-grow: 1;
-            max-width: 300px;
-            margin-left: 40px;
+        .progress-block {
+            text-align: right;
+            min-width: 180px;
+        }
+
+        .progress-rail {
+            width: 100%;
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 4px;
         }
 
         .progress-bar {
-            background: var(--apple-border);
-            height: 6px;
-            width: 100%;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: var(--apple-blue);
             height: 100%;
+            background: var(--sf-blue);
             width: 0%;
-            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
-        .stats {
-            font-size: 12px;
-            color: var(--apple-text-secondary);
-            margin-top: 4px;
-            text-align: right;
+        .progress-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--sf-text-dim);
+            text-transform: uppercase;
         }
 
-        .intro {
-            padding: 60px 0 40px;
+        .hero {
+            padding: 60px 0;
             text-align: center;
         }
 
-        .intro h2 {
-            font-size: 48px;
+        .hero h2 {
+            font-size: 56px;
             font-weight: 700;
-            letter-spacing: -0.015em;
-            margin-bottom: 16px;
+            letter-spacing: -0.03em;
+            margin-bottom: 20px;
+            background: linear-gradient(to bottom, #1d1d1f, #86868b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .intro p {
-            font-size: 21px;
-            color: var(--apple-text-secondary);
-            max-width: 600px;
+        .hero p {
+            font-size: 24px;
+            color: var(--sf-text-dim);
+            max-width: 700px;
             margin: 0 auto;
+            font-weight: 400;
         }
 
-        .section {
-            background: var(--apple-card);
-            border-radius: var(--radius);
-            margin-bottom: 24px;
-            padding: 32px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        .blueprint-section {
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease-out;
+        }
+
+        .blueprint-section.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .section-header {
             margin-bottom: 24px;
-            border-bottom: 1px solid var(--apple-border);
-            padding-bottom: 16px;
         }
 
         .section-header h3 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
+            letter-spacing: -0.02em;
         }
 
-        .checklist-item {
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--sf-card);
+            border: 1px solid var(--sf-border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
             display: flex;
-            align-items: flex-start;
-            padding: 16px 0;
-            border-bottom: 1px solid #f0f0f2;
+            gap: 20px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .checklist-item:last-child {
-            border-bottom: none;
-        }
-
-        .checkbox {
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--apple-border);
-            border-radius: 50%;
-            margin-right: 16px;
-            margin-top: 2px;
-            flex-shrink: 0;
             position: relative;
-            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            background: #ffffff;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+            transform: scale(1.01);
+        }
+
+        .card.checked {
+            border-color: var(--sf-blue);
+            background: rgba(0, 113, 227, 0.02);
+        }
+
+        .check-container {
+            flex-shrink: 0;
+            padding-top: 4px;
+        }
+
+        .check-circle {
+            width: 28px;
+            height: 28px;
+            border: 2px solid var(--sf-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .card.checked .check-circle {
+            background: var(--sf-blue);
+            border-color: var(--sf-blue);
+        }
+
+        .check-circle svg {
+            width: 14px;
+            height: 14px;
+            fill: white;
+            opacity: 0;
+            transform: scale(0.5);
             transition: all 0.2s;
         }
 
-        .checkbox:checked {
-            background-color: var(--apple-blue);
-            border-color: var(--apple-blue);
+        .card.checked .check-circle svg {
+            opacity: 1;
+            transform: scale(1);
         }
 
-        .checkbox:checked::after {
-            content: '✓';
-            color: white;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .item-content {
+        .content {
             flex-grow: 1;
         }
 
-        .item-title {
-            font-size: 17px;
+        .title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .title {
+            font-size: 19px;
             font-weight: 600;
-            margin-bottom: 4px;
+            letter-spacing: -0.01em;
         }
 
-        .item-desc {
+        .description {
             font-size: 15px;
-            color: var(--apple-text-secondary);
+            color: var(--sf-text-dim);
+            margin-bottom: 12px;
+            line-height: 1.5;
         }
 
-        .tag {
-            display: inline-block;
+        .meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             text-transform: uppercase;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: #eee;
-            margin-top: 8px;
-            letter-spacing: 0.05em;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.02em;
         }
 
-        .tag.critical { background: #ffe7e7; color: #ff3b30; }
-        .tag.network { background: #e7f4ff; color: #0071e3; }
-        .tag.security { background: #f0e7ff; color: #5856d6; }
+        .badge.network { background: #e7f4ff; color: #0071e3; }
+        .badge.security { background: #f0e7ff; color: #5856d6; }
+        .badge.org { background: #fff4e7; color: #ff9500; }
+        .badge.ops { background: #e7fff0; color: #28cd41; }
 
         footer {
+            margin-top: 100px;
+            padding: 60px 0;
+            border-top: 1px solid var(--sf-border);
             text-align: center;
-            padding: 40px;
-            color: var(--apple-text-secondary);
-            font-size: 14px;
+            color: var(--sf-text-dim);
         }
 
-        @media (max-width: 600px) {
-            .intro h2 { font-size: 32px; }
-            .intro p { font-size: 18px; }
-            .progress-container { display: none; }
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 40px; }
+            .hero p { font-size: 18px; }
+            .nav-content .progress-block { display: none; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="container">
-            <h1>Apigee X Blueprint</h1>
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div id="progressFill" class="progress-fill"></div>
+        <div class="app-container">
+            <div class="nav-content">
+                <div class="brand">
+                    <div class="brand-logo">A</div>
+                    <h1>Apigee X Enterprise</h1>
                 </div>
-                <div id="progressText" class="stats">0 of 0 components ready</div>
+                <div class="progress-block">
+                    <div class="progress-rail">
+                        <div id="progressBar" class="progress-bar"></div>
+                    </div>
+                    <div id="progressLabel" class="progress-label">0% Complete</div>
+                </div>
             </div>
         </div>
     </header>
 
-    <main class="container">
-        <div class="intro">
-            <h2>Enterprise Readiness.</h2>
-            <p>The definitive checklist for Apigee X deployment on Google Cloud Platform.</p>
-        </div>
+    <main class="app-container">
+        <section class="hero">
+            <h2>The Blueprint.</h2>
+            <p>A precision-engineered guide for deploying Apigee X at scale on Google Cloud.</p>
+        </section>
 
-        <!-- Section 1: Foundation -->
-        <div class="section">
+        <div class="blueprint-section" id="section-1">
             <div class="section-header">
-                <h3>1. Foundational Infrastructure</h3>
+                <h3>1. Foundation & Governance</h3>
             </div>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c1">
-                    <label for="c1" class="item-content">
-                        <div class="item-title">GCP Project & Organization</div>
-                        <div class="item-desc">Dedicated GCP Project established with Billing enabled.</div>
-                        <span class="tag critical">Critical</span>
-                    </label>
+            <div class="grid">
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Resource Hierarchy Setup</div></div>
+                        <div class="description">Establish a dedicated Folder and Project structure. Ensure Organization-level policies are in place for region restrictions and VPC peering.</div>
+                        <div class="meta"><span class="badge org">Org</span></div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c2">
-                    <label for="c2" class="item-content">
-                        <div class="item-title">APIs Activation</div>
-                        <div class="item-desc">Enable apigee.googleapis.com, servicenetworking.googleapis.com, and compute.googleapis.com.</div>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 2: Networking -->
-        <div class="section">
-            <div class="section-header">
-                <h3>2. Networking Architecture</h3>
-            </div>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c3">
-                    <label for="c3" class="item-content">
-                        <div class="item-title">Custom VPC Network</div>
-                        <div class="item-desc">Avoid "default" VPC. Use a custom VPC for better isolation and routing control.</div>
-                        <span class="tag network">Networking</span>
-                    </label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c4">
-                    <label for="c4" class="item-content">
-                        <div class="item-title">Private Service Access (PSA)</div>
-                        <div class="item-desc">Reserved /22 CIDR range for Google Services peering (Apigee internal IPs).</div>
-                    </label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c5">
-                    <label for="c5" class="item-content">
-                        <div class="item-title">Service Networking Connection</div>
-                        <div class="item-desc">Peering established between your VPC and the Google Services VPC.</div>
-                    </label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c6">
-                    <label for="c6" class="item-content">
-                        <div class="item-title">Cloud NAT & Cloud Router</div>
-                        <div class="item-desc">Enable outbound internet access for private instances (for southbound integration).</div>
-                    </label>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Enterprise API Activation</div></div>
+                        <div class="description">Enable: apigee.googleapis.com, servicenetworking.googleapis.com, compute.googleapis.com, cloudkms.googleapis.com, and dns.googleapis.com.</div>
+                        <div class="meta"><span class="badge org">Org</span></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 3: Security & KMS -->
-        <div class="section">
+        <div class="blueprint-section" id="section-2">
             <div class="section-header">
-                <h3>3. Security & Identity</h3>
+                <h3>2. Advanced Networking</h3>
             </div>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c7">
-                    <label for="c7" class="item-content">
-                        <div class="item-title">Cloud KMS (CMEK)</div>
-                        <div class="item-desc">Create a Key Ring and a CryptoKey for disk encryption of Apigee data.</div>
-                        <span class="tag security">Security</span>
-                    </label>
+            <div class="grid">
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Shared VPC Architecture</div></div>
+                        <div class="description">Configure Apigee in a Service Project attached to a Host Project's Shared VPC. Define subnets across 3 availability zones for high availability.</div>
+                        <div class="meta"><span class="badge network">Network</span></div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c8">
-                    <label for="c8" class="item-content">
-                        <div class="item-title">KMS IAM Binding</div>
-                        <div class="item-desc">Grant 'cloudkms.cryptoKeyEncrypterDecrypter' to the Apigee Service Agent.</div>
-                    </label>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Private Service Access (PSA)</div></div>
+                        <div class="description">Reserve a non-overlapping /22 CIDR range for internal Google services. Create the peering connection to the 'google-managed-services' VPC.</div>
+                        <div class="meta"><span class="badge network">Network</span></div>
+                    </div>
+                </div>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Private Service Connect (PSC)</div></div>
+                        <div class="description">Establish PSC Service Attachments for northbound load balancing. This removes the need for complex VPC peering in certain hybrid topologies.</div>
+                        <div class="meta"><span class="badge network">Network</span></div>
+                    </div>
+                </div>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Cloud NAT & Hybrid Connect</div></div>
+                        <div class="description">Ensure Cloud NAT is configured for egress. Setup Interconnect or Cloud VPN for southbound connectivity to on-premise backends.</div>
+                        <div class="meta"><span class="badge network">Network</span></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 4: Apigee Provisioning -->
-        <div class="section">
+        <div class="blueprint-section" id="section-3">
             <div class="section-header">
-                <h3>4. Apigee X Core Provisioning</h3>
+                <h3>3. Security & Encryption</h3>
             </div>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c9">
-                    <label for="c9" class="item-content">
-                        <div class="item-title">Apigee Organization</div>
-                        <div class="item-desc">Provision the organization with the chosen networking mode (Peering or PSC).</div>
-                    </label>
+            <div class="grid">
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Cloud KMS (CMEK) Strategy</div></div>
+                        <div class="description">Provision regional Key Rings and CryptoKeys. Grant Encrypter/Decrypter roles to the Apigee Service Agent for data-at-rest protection.</div>
+                        <div class="meta"><span class="badge security">Security</span></div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c10">
-                    <label for="c10" class="item-content">
-                        <div class="item-title">Apigee Instance</div>
-                        <div class="item-desc">Deploy instance in primary region with assigned IP range and KMS key.</div>
-                    </label>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Cloud Armor & WAF</div></div>
+                        <div class="description">Define security policies for DDoS protection, IP whitelisting, and OWASP Top 10 mitigation at the Load Balancer level.</div>
+                        <div class="meta"><span class="badge security">Security</span></div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c11">
-                    <label for="c11" class="item-content">
-                        <div class="item-title">Environment & Env Groups</div>
-                        <div class="item-desc">Define logical environments (dev, prod) and assign hostnames via Env Groups.</div>
-                    </label>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Identity-Aware Proxy (IAP)</div></div>
+                        <div class="description">(Optional) Enable IAP for administrative endpoints or developer portals to enforce identity-based access control.</div>
+                        <div class="meta"><span class="badge security">Security</span></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 5: Routing & Access -->
-        <div class="section">
+        <div class="blueprint-section" id="section-4">
             <div class="section-header">
-                <h3>5. Northbound & Southbound Routing</h3>
+                <h3>4. Core Provisioning</h3>
             </div>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c12">
-                    <label for="c12" class="item-content">
-                        <div class="item-title">Private Service Connect (PSC) for LB</div>
-                        <div class="item-desc">Create a Service Attachment in the Apigee project to expose the instance to your LB.</div>
-                        <span class="tag network">Networking</span>
-                    </label>
+            <div class="grid">
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Organization Provisioning</div></div>
+                        <div class="description">Initialize the Apigee Org. Link it to the KMS key and the PSA range. Wait for the "Complete" status (approx. 20-40 mins).</div>
+                        <div class="meta"><span class="badge org">Org</span></div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c13">
-                    <label for="c13" class="item-content">
-                        <div class="item-title">Global External HTTP(S) Load Balancer</div>
-                        <div class="item-desc">Setup GLB with Frontend IP, SSL Certificate, and PSC NEG backend.</div>
-                    </label>
-                </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c14">
-                    <label for="c14" class="item-content">
-                        <div class="item-title">Cloud DNS Private Zones</div>
-                        <div class="item-desc">Configure DNS for internal resolution of southbound backends.</div>
-                    </label>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Environment Groups</div></div>
+                        <div class="description">Create Env Groups for 'Prod', 'Non-Prod', and 'Sandbox'. Assign production hostnames (TLD) and attach SSL certificates.</div>
+                        <div class="meta"><span class="badge org">Org</span></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Section 6: Governance -->
-        <div class="section">
+        <div class="blueprint-section" id="section-5">
             <div class="section-header">
-                <h3>6. Operations & Monitoring</h3>
+                <h3>5. Operations & Scaling</h3>
             </div>
-            <div class="checklist">
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c15">
-                    <label for="c15" class="item-content">
-                        <div class="item-title">Cloud Monitoring Dashboard</div>
-                        <div class="item-desc">Setup alerts for Latency, Error Rates, and Target Connectivity.</div>
-                    </label>
+            <div class="grid">
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Multi-Region Expansion</div></div>
+                        <div class="description">Deploy instances in secondary regions for DR/HA. Ensure 'Global External Load Balancing' is routing traffic to the nearest healthy instance.</div>
+                        <div class="meta"><span class="badge ops">Ops</span></div>
+                    </div>
                 </div>
-                <div class="checklist-item">
-                    <input type="checkbox" class="checkbox" id="c16">
-                    <label for="c16" class="item-content">
-                        <div class="item-title">Audit Logs</div>
-                        <div class="item-desc">Enable Data Access logs for Apigee for security compliance.</div>
-                    </label>
+                <div class="card" onclick="toggleCheck(this)">
+                    <div class="check-container"><div class="check-circle"><svg viewBox="0 0 20 20"><path d="M7.629 14.571L3.125 10.068l1.107-1.107L7.629 12.35l8.13-8.13 1.107 1.107z"/></svg></div></div>
+                    <div class="content">
+                        <div class="title-row"><div class="title">Monitoring & Alerting</div></div>
+                        <div class="description">Setup Cloud Monitoring dashboards for 'Apigee Request Count' and 'Latencies'. Configure Alerts for 4xx/5xx spikes.</div>
+                        <div class="meta"><span class="badge ops">Ops</span></div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
     <footer>
-        <p>Designed with Apple standards for Google Cloud Architects.</p>
-        <p style="margin-top: 8px;">&copy; 2024 Enterprise Apigee X Blueprint</p>
+        <p>Built with Apple Design Standards for GCP Architects.</p>
+        <p style="font-size: 13px; margin-top: 10px;">&copy; 2026 Enterprise Blueprint. All Rights Reserved.</p>
     </footer>
 
     <script>
-        const checkboxes = document.querySelectorAll('.checkbox');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-
         function updateProgress() {
-            const total = checkboxes.length;
-            const checked = document.querySelectorAll('.checkbox:checked').length;
-            const percentage = (checked / total) * 100;
+            const cards = document.querySelectorAll('.card');
+            const checked = document.querySelectorAll('.card.checked');
+            const percent = cards.length ? Math.round((checked.length / cards.length) * 100) : 0;
             
-            progressFill.style.width = percentage + '%';
-            progressText.innerText = `${checked} of ${total} components ready`;
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressLabel').innerText = percent + '% Complete';
             
-            // Save state
-            const state = Array.from(checkboxes).map(c => ({ id: c.id, checked: c.checked }));
-            localStorage.setItem('apigee_checklist_state', JSON.stringify(state));
+            const state = Array.from(cards).map(card => card.classList.contains('checked'));
+            localStorage.setItem('apigee_blueprint_state', JSON.stringify(state));
         }
 
-        // Load state
+        function toggleCheck(card) {
+            card.classList.toggle('checked');
+            updateProgress();
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
+        }
+
         window.addEventListener('load', () => {
-            const saved = localStorage.getItem('apigee_checklist_state');
+            const saved = localStorage.getItem('apigee_blueprint_state');
             if (saved) {
                 const state = JSON.parse(saved);
-                state.forEach(item => {
-                    const cb = document.getElementById(item.id);
-                    if (cb) cb.checked = item.checked;
+                document.querySelectorAll('.card').forEach((card, i) => {
+                    if (state[i]) card.classList.add('checked');
                 });
             }
             updateProgress();
-        });
 
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', updateProgress);
-        });
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('visible');
+                });
+            }, { threshold: 0.1 });
 
-        // Make the whole item clickable
-        document.querySelectorAll('.checklist-item').forEach(item => {
-            item.addEventListener('click', (e) => {
-                if (e.target.type !== 'checkbox') {
-                    const cb = item.querySelector('.checkbox');
-                    cb.checked = !cb.checked;
-                    updateProgress();
-                }
+            document.querySelectorAll('.blueprint-section').forEach(section => {
+                observer.observe(section);
             });
         });
     </script>
