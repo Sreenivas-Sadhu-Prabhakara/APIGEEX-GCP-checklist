@@ -5,7 +5,10 @@ through what it takes to stand up **Apigee X** on top of an enterprise GCP landi
 It explains the concepts simply and, crucially, spells out **everything we need from the client** to provision.
 
 ## What's inside
-- **22 slides** — concept → object model → reference architecture → per-zone checklist → provisioning sequence → ask → timeline → next steps.
+- **24 slides** — concept → object model → reference architecture → per-zone checklist → provisioning sequence → bill of materials → ask → timeline → next steps.
+- **By the numbers** — a resource bill of materials (service accounts, reserved IPs, ports, FQDNs, CMEK keys, firewall rules) with a donut + KPI tiles, and a single-vs-dual-region comparison.
+- **Ports, IPs & FQDNs** — a firewall/DNS allow-list matrix (north/south/egress/health/hybrid), per-region IP allocation, and the FQDN breakdown.
+- **Data visualizations** — donut (service-account mix), KPI stat tiles, IP-allocation mini-bars, ports matrix, and an illustrative cost-share bar.
 - **Apigee object model** — Organization / Environment Groups / Environments / Instances explained as an inline diagram.
 - **Reference architecture** — the "Landing Zone Blueprint", an inline SVG split into 7 named build zones (Z1–Z7), with real GCP resources and the LB health-check ranges.
 - **Per-zone checklists** — each zone has two columns: *what we configure* (with the actual resources, roles & constraints) and *what we need from you*.
