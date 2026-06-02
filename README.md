@@ -1,24 +1,35 @@
-# Apigee X Enterprise Deployment Checklist
+# Apigee X on a GCP Enterprise Landing Zone — Setup Blueprint & Checklist
 
-An Apple-inspired, minimalist, and comprehensive checklist for deploying Apigee X on Google Cloud Platform (GCP) following enterprise best practices.
+A consultant-grade, self-contained HTML presentation for walking a (semi-technical) client
+through what it takes to stand up **Apigee X** on top of an enterprise GCP landing zone.
+It explains the concepts simply and, crucially, spells out **everything we need from the client** to provision.
 
-## Features
-- **Apple UI/UX:** Clean aesthetics, high-contrast typography, and smooth transitions.
-- **Enterprise Grade:** Covers VPC, PSA, PSC, KMS, GLB, and more.
-- **Persistence:** Progress is automatically saved to your browser's local storage.
-- **Responsive:** Optimized for desktop and mobile viewing.
+## What's inside
+- **20 slides** — concept → reference architecture → per-zone checklist → ask → timeline → next steps.
+- **Reference architecture** — the "Landing Zone Blueprint", an inline SVG split into 7 named build zones (Z1–Z7).
+- **Per-zone checklists** — each zone has two columns: *what we configure* and *what we need from you*.
+- **Consolidated pre-requisites slide** — the single takeaway the client keeps.
+- **Speaker notes** — hidden on screen (press `N` or the *Notes* button), printed in the PDF export.
 
-## GCP Components Covered
-- **Foundational:** Project setup, IAM, API activation.
-- **Networking:** Custom VPC, PSA Peering, Cloud NAT, Cloud Router.
-- **Security:** Cloud KMS (CMEK), Service Agent bindings.
-- **Apigee X Core:** Org provisioning, Instance creation, Env Groups.
-- **Routing:** Private Service Connect (PSC), Global External HTTP(S) Load Balancer.
-- **Operations:** Cloud Monitoring, Audit Logging.
+## The 7 build zones
+| Zone | Focus |
+| ---- | ----- |
+| **Z1** | Foundation & Identity — projects, IAM, billing, API enablement |
+| **Z2** | Networking & VPC — Shared VPC, PSA `/22`, Cloud Router + NAT |
+| **Z3** | Apigee X Runtime — org, regional instances, env groups, CMEK |
+| **Z4** | Northbound Ingress — PSC NEG, Global External ALB, Cloud Armor, certs, DNS |
+| **Z5** | Southbound Connectivity — GKE/Cloud Run/Compute, PSC, on-prem via Interconnect/VPN |
+| **Z6** | Security & Governance — Cloud KMS/CMEK, VPC-SC, Org Policy, Secret Manager |
+| **Z7** | Observability & Operations — Cloud Monitoring, Logging, API Analytics, alerting |
+
+## Using the deck
+- **Navigate:** `→` / `Space` next · `←` previous · click right/left half · `Home`/`End` jump · `N` toggle notes.
+- **Export PDF:** `Ctrl/Cmd+P` → A4 Landscape, background graphics on. Colors and speaker notes are preserved.
+- **Tech:** single `index.html`, no build step. Tailwind + anime.js via CDN, inline SVG, Google Fonts (Poppins/Inter).
 
 ## Deployment
-This project is designed to be hosted on **Netlify**. 
-Simply push to the main branch and Netlify will serve the `index.html`.
+Hosted on **GitHub Pages** via the `Enterprise Deployment` GitHub Actions workflow (`.github/workflows/deploy.yml`).
+Pushing to `main` builds and publishes `index.html` automatically.
 
 ---
-*Designed for Cloud Architects by an AI UI/UX Specialist.*
+*Enterprise API platform walkthrough material.*
