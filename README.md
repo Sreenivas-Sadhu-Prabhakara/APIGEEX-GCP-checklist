@@ -5,11 +5,14 @@ through what it takes to stand up **Apigee X** on top of an enterprise GCP landi
 It explains the concepts simply and, crucially, spells out **everything we need from the client** to provision.
 
 ## What's inside
-- **20 slides** — concept → reference architecture → per-zone checklist → ask → timeline → next steps.
-- **Reference architecture** — the "Landing Zone Blueprint", an inline SVG split into 7 named build zones (Z1–Z7).
-- **Per-zone checklists** — each zone has two columns: *what we configure* and *what we need from you*.
+- **22 slides** — concept → object model → reference architecture → per-zone checklist → provisioning sequence → ask → timeline → next steps.
+- **Apigee object model** — Organization / Environment Groups / Environments / Instances explained as an inline diagram.
+- **Reference architecture** — the "Landing Zone Blueprint", an inline SVG split into 7 named build zones (Z1–Z7), with real GCP resources and the LB health-check ranges.
+- **Per-zone checklists** — each zone has two columns: *what we configure* (with the actual resources, roles & constraints) and *what we need from you*.
+- **Provisioning sequence** — the ordered build (keys → peering → runtime → ingress → southbound).
 - **Consolidated pre-requisites slide** — the single takeaway the client keeps.
 - **Speaker notes** — hidden on screen (press `N` or the *Notes* button), printed in the PDF export.
+- **Design system** — Poppins/Inter/JetBrains Mono, inline icon set, slide chrome (section + page no.), top progress rail, gradient + drop-shadow diagrams.
 
 ## The 7 build zones
 | Zone | Focus |

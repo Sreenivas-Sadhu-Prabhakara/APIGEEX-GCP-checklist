@@ -9,28 +9,29 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Anime.js — slide transitions only -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
-<!-- Google Fonts: Poppins (headings) + Inter (body) -->
+<!-- Google Fonts: Poppins (headings) + Inter (body) + JetBrains Mono (technical tokens) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <script>
   tailwind.config = {
     theme: {
       extend: {
         colors: {
-          primary:   '#5B3FD6', // Apigee violet
-          secondary: '#1A73E8', // blue
-          accent:    '#34A853', // green
-          amber:     '#FBBC04', // yellow
-          coral:     '#EA4335', // red
-          surface:   '#F5F4FB', // soft violet-white
-          ink:       '#1A1333', // deep violet-ink
+          primary:   '#5B3FD6',
+          secondary: '#1A73E8',
+          accent:    '#34A853',
+          amber:     '#E8A400',
+          coral:     '#EA4335',
+          surface:   '#F5F4FB',
+          ink:       '#1A1333',
           dark:      '#150E2E',
         },
         fontFamily: {
           heading: ['Poppins', 'sans-serif'],
           body:    ['Inter', 'sans-serif'],
+          mono:    ['"JetBrains Mono"', 'monospace'],
         },
       },
     },
@@ -47,204 +48,243 @@
     display:flex; flex-direction:column; justify-content:center;
     position:relative; overflow:hidden;
   }
-  .slide-pad { padding: 4.2vh 5vw; }
+  .slide-pad { padding: 5vh 5vw 7vh; }
 
-  /* Background utilities */
+  /* ---------- Background utilities ---------- */
   .bg-dots {
-    background-image: radial-gradient(circle, rgba(91,63,214,0.10) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(91,63,214,0.09) 1px, transparent 1px);
     background-size: 22px 22px;
   }
   .bg-grid {
     background-image:
-      linear-gradient(rgba(91,63,214,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(91,63,214,0.06) 1px, transparent 1px);
+      linear-gradient(rgba(91,63,214,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,63,214,0.05) 1px, transparent 1px);
     background-size: 42px 42px;
   }
   .bg-grid-dark {
     background-image:
-      linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+      linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
     background-size: 46px 46px;
   }
+  /* decorative soft blobs for dark slides */
+  .blob { position:absolute; border-radius:9999px; filter:blur(60px); opacity:.5; pointer-events:none; }
 
-  .eyebrow { letter-spacing:.22em; text-transform:uppercase; font-weight:700; }
-  .card { border:1px solid rgba(91,63,214,0.14); box-shadow:0 8px 30px -18px rgba(26,19,51,0.45); }
-  .chip { display:inline-flex; align-items:center; gap:.4rem; border-radius:9999px; font-weight:600; }
+  /* ---------- Type & components ---------- */
+  .kicker { display:inline-flex; align-items:center; gap:.55rem; letter-spacing:.2em; text-transform:uppercase; font-weight:700; font-size:12px; }
+  .kicker::before { content:""; width:26px; height:2px; border-radius:2px; background:currentColor; display:inline-block; opacity:.7; }
+  .grad-text { background-clip:text; -webkit-background-clip:text; color:transparent; }
+
+  .card { background:#fff; border:1px solid rgba(91,63,214,0.12); border-radius:1rem;
+    box-shadow:0 1px 2px rgba(26,19,51,.04), 0 14px 34px -22px rgba(26,19,51,.42); }
+  .card-soft { background:#F7F5FF; border:1px solid rgba(91,63,214,0.10); border-radius:1rem; }
+  .glass { background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:1rem; backdrop-filter:blur(8px); }
+  .accent-top { border-top:3px solid var(--ac,#5B3FD6); }
 
   .zbadge { display:inline-flex; align-items:center; justify-content:center; font-family:'Poppins'; font-weight:700; }
-  .tick { flex:0 0 auto; width:1.05rem; height:1.05rem; border-radius:.3rem; display:inline-flex; align-items:center; justify-content:center; font-size:.7rem; }
+  .zicon { display:inline-flex; align-items:center; justify-content:center; border-radius:.85rem; }
+  .ico { width:1.5rem; height:1.5rem; stroke:currentColor; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+  .ico-sm { width:1.05rem; height:1.05rem; }
 
-  /* Slide indicator */
-  #indicator { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:6px; z-index:50; }
-  .dot { width:9px; height:9px; border-radius:9999px; background:rgba(91,63,214,0.28); transition:all .3s; }
-  .dot.active { width:11px; height:11px; background:#5B3FD6; box-shadow:0 0 0 4px rgba(91,63,214,0.18); }
-  .dash { width:14px; height:2px; background:rgba(91,63,214,0.18); border-radius:2px; }
+  .tick { flex:0 0 auto; width:1.15rem; height:1.15rem; border-radius:.35rem; display:inline-flex; align-items:center; justify-content:center; font-size:.72rem; margin-top:1px; }
+
+  .mono { font-family:'JetBrains Mono',monospace; font-size:.74em; background:rgba(91,63,214,.07);
+    color:#4a2cc4; padding:.06em .42em; border-radius:.36em; border:1px solid rgba(91,63,214,.14); white-space:nowrap; }
+  .mono-d { font-family:'JetBrains Mono',monospace; font-size:.74em; background:rgba(255,255,255,.08);
+    color:#cfc4ff; padding:.06em .42em; border-radius:.36em; border:1px solid rgba(255,255,255,.16); white-space:nowrap; }
+
+  .watermark { position:absolute; right:3vw; top:2vh; font-family:'Poppins'; font-weight:800;
+    font-size:200px; line-height:1; color:rgba(91,63,214,0.05); pointer-events:none; user-select:none; z-index:0; }
+
+  /* ---------- Slide chrome (footer, prints) ---------- */
+  .slide-foot { position:absolute; left:5vw; right:5vw; bottom:2.4vh; display:flex; align-items:center;
+    justify-content:space-between; font-size:11.5px; letter-spacing:.02em; z-index:5; pointer-events:none; }
+  .slide-foot .fl { display:flex; align-items:center; gap:.5rem; font-weight:600; }
+  .slide-foot .fl .pip { width:7px; height:7px; border-radius:9999px; background:#5B3FD6; display:inline-block; }
+  .foot-light { color:rgba(26,19,51,.42); }
+  .foot-light .pip { background:#5B3FD6; }
+  .foot-dark { color:rgba(255,255,255,.45); }
+  .foot-dark .pip { background:#9B7BFF; }
+
+  /* top progress rail (screen only) */
+  #rail { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,#5B3FD6,#1A73E8); z-index:60; transition:width .5s ease; }
+
+  /* ---------- Slide indicator ---------- */
+  #indicator { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:5px; z-index:50; }
+  .dot { width:8px; height:8px; border-radius:9999px; background:rgba(91,63,214,0.26); transition:all .3s; }
+  .dot.active { width:10px; height:10px; background:#5B3FD6; box-shadow:0 0 0 4px rgba(91,63,214,0.16); }
+  .dash { width:10px; height:2px; background:rgba(91,63,214,0.16); border-radius:2px; }
 
   #hud { position:fixed; z-index:50; }
   .ctrlbtn { backdrop-filter:blur(6px); }
 
-  /* Speaker notes hidden on screen unless toggled */
+  /* ---------- Speaker notes ---------- */
   .speaker-notes { display:none; }
   body.show-notes .speaker-notes {
-    display:block; position:absolute; left:5vw; right:5vw; bottom:7vh;
-    background:rgba(21,14,46,0.96); color:#EDEBFA; border:1px solid rgba(255,255,255,0.12);
-    border-radius:14px; padding:16px 20px; font-size:13.5px; line-height:1.5; z-index:40; max-height:34vh; overflow:auto;
-  }
+    display:block; position:absolute; left:5vw; right:5vw; bottom:6vh;
+    background:rgba(21,14,46,0.97); color:#EDEBFA; border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px; padding:15px 20px; font-size:13px; line-height:1.5; z-index:45; max-height:32vh; overflow:auto; }
 
   @media print {
     @page { size: A4 landscape; margin:0; }
     html, body { overflow:visible; background:#fff; }
     * { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
     #slides-track { display:block !important; height:auto !important; transform:none !important; }
-    .slide {
-      display:flex !important; position:relative !important; transform:none !important;
-      page-break-after:always; break-inside:avoid; width:100vw; height:100vh;
-    }
+    .slide { display:flex !important; position:relative !important; transform:none !important;
+      page-break-after:always; break-inside:avoid; width:100vw; height:100vh; }
     .no-print { display:none !important; }
-    .speaker-notes {
-      display:block !important; position:relative !important; left:0; right:0; bottom:0;
+    .speaker-notes { display:block !important; position:relative !important; left:0; right:0; bottom:0;
       margin-top:10px; background:#f3f1fb; color:#1A1333; border:1px solid #d7d0f3;
-      border-radius:8px; padding:8px 12px; font-size:10px; max-height:none;
-    }
+      border-radius:8px; padding:8px 12px; font-size:9.5px; max-height:none; }
   }
 </style>
 </head>
 <body class="font-body text-ink">
 
+<!-- ============ ICON SPRITE ============ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ic-foundation" viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6"/></symbol>
+  <symbol id="ic-network" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/><path d="M12 7.2v4M10.5 13l-4 4M13.5 13l4 4"/></symbol>
+  <symbol id="ic-runtime" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3M10 10h4v4h-4z"/></symbol>
+  <symbol id="ic-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></symbol>
+  <symbol id="ic-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></symbol>
+  <symbol id="ic-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9.5 12l1.8 1.8L15 10"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="2.6"/></symbol>
+  <symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M16 16l2-2M14 14l2-2"/></symbol>
+  <symbol id="ic-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5M3 17l9 5 9-5" opacity=".75"/></symbol>
+  <symbol id="ic-route" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="18" r="2.4"/><path d="M8 6h7a3 3 0 0 1 3 3v6M6 8.5V15"/></symbol>
+  <symbol id="ic-list" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="ic-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h12l-2 4 2 4H5"/></symbol>
+  <symbol id="ic-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+  <symbol id="ic-gauge" viewBox="0 0 24 24"><path d="M4 18a8 8 0 1 1 16 0"/><path d="M12 14l4-3"/></symbol>
+</svg>
+
 <div id="presentation-container">
   <div id="slides-track">
 
     <!-- ============ SLIDE 1 — TITLE (DARK) ============ -->
-    <section class="slide slide-dark slide-pad bg-grid-dark" style="background:radial-gradient(1200px 600px at 78% 18%, #2a1d63 0%, #150E2E 55%, #0c0820 100%);">
-      <div class="absolute top-8 left-[5vw] flex items-center gap-3">
-        <svg width="34" height="34" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#8B6BFF" stroke-width="2.5"/><path d="M16 30c4-2 6-6 8-10s4-8 8-10" stroke="#FBBC04" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="30" r="3.4" fill="#34A853"/><circle cx="32" cy="10" r="3.4" fill="#EA4335"/></svg>
-        <span class="text-white/80 font-heading font-semibold tracking-wide">API Platform Engineering</span>
+    <section class="slide slide-dark slide-pad bg-grid-dark" data-sec="Introduction" style="background:radial-gradient(1200px 620px at 80% 12%, #2c1f6a 0%, #160F31 52%, #0c0820 100%);">
+      <div class="blob" style="width:380px;height:380px;background:#5B3FD6;top:-90px;right:8%;"></div>
+      <div class="blob" style="width:300px;height:300px;background:#1A73E8;bottom:-80px;left:-40px;opacity:.35;"></div>
+
+      <div class="absolute top-8 left-[5vw] flex items-center gap-3 z-10">
+        <svg width="36" height="36" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#8B6BFF" stroke-width="2.5"/><path d="M14 31c5-2.5 7-7.5 9.5-12.5S30 8 34 7" stroke="#E8A400" stroke-width="3" stroke-linecap="round"/><circle cx="14" cy="31" r="3.6" fill="#34A853"/><circle cx="34" cy="9" r="3.6" fill="#EA4335"/><circle cx="24" cy="20" r="2.6" fill="#1A73E8"/></svg>
+        <span class="text-white/85 font-heading font-semibold tracking-wide">API Platform Engineering</span>
       </div>
 
-      <div class="max-w-5xl">
-        <p class="eyebrow text-[13px] text-amber mb-5">Enterprise API Management • Solution Walkthrough</p>
-        <h1 class="font-heading font-extrabold text-white leading-[1.05] text-[58px]">
-          Apigee X on a<br/><span class="text-transparent bg-clip-text" style="background-image:linear-gradient(90deg,#9B7BFF, #5B3FD6 40%, #1A73E8);">GCP Enterprise Landing Zone</span>
+      <div class="max-w-5xl relative z-10">
+        <p class="kicker text-amber mb-5">Enterprise API Management · Solution Walkthrough</p>
+        <h1 class="font-heading font-extrabold text-white leading-[1.04] text-[60px]">
+          Apigee X on a<br/><span class="grad-text" style="background-image:linear-gradient(90deg,#A78BFF, #6B4DF0 38%, #1A73E8);">GCP Enterprise Landing Zone</span>
         </h1>
         <p class="text-white/70 text-[20px] mt-6 max-w-3xl leading-relaxed">
-          A guided setup checklist and reference architecture — what we build, in which order,
-          and exactly what we need from your teams to go live.
+          A guided setup blueprint and engineering checklist — the reference architecture, the build sequence,
+          and exactly which inputs we need from your platform, network &amp; security teams to go live.
         </p>
 
         <div class="flex flex-wrap gap-3 mt-9">
-          <span class="chip bg-white/10 text-white px-4 py-2 text-sm border border-white/15">7 Build Zones</span>
-          <span class="chip bg-white/10 text-white px-4 py-2 text-sm border border-white/15">Reference Blueprint</span>
-          <span class="chip bg-white/10 text-white px-4 py-2 text-sm border border-white/15">Pre-requisites Checklist</span>
-          <span class="chip bg-white/10 text-white px-4 py-2 text-sm border border-white/15">~20 min</span>
+          <span class="glass text-white px-4 py-2 text-sm rounded-full">7 Build Zones · Z1–Z7</span>
+          <span class="glass text-white px-4 py-2 text-sm rounded-full">Reference Blueprint</span>
+          <span class="glass text-white px-4 py-2 text-sm rounded-full">Provisioning Sequence</span>
+          <span class="glass text-white px-4 py-2 text-sm rounded-full">Pre-requisites Checklist</span>
         </div>
       </div>
 
-      <div class="absolute bottom-8 left-[5vw] right-[5vw] flex items-center justify-between text-white/45 text-[13px] border-t border-white/10 pt-4">
+      <div class="absolute bottom-8 left-[5vw] right-[5vw] flex items-center justify-between text-white/45 text-[13px] border-t border-white/10 pt-4 z-10">
         <span>Prepared for: &lt;Client Name&gt;</span>
         <span>Confidential — for client discussion</span>
       </div>
 
-      <aside class="speaker-notes">
-        <strong>Speaker notes:</strong> Open warm. This is a working session, not a sales pitch. Goal in 20 minutes: (1) make Apigee X understandable for a semi-technical audience, (2) show the target architecture on their landing zone, (3) leave with a crisp list of inputs we need from them. Promise that the “what we need from you” checklist is the takeaway.
-      </aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Open warm — this is a working session, not a pitch. Goal in 20 minutes: (1) make Apigee X understandable for a semi-technical room, (2) show the target architecture on their landing zone with real engineering specifics, (3) leave with a precise list of inputs we need. Tell them the “what we need from you” checklist (Z-by-Z and consolidated) is the takeaway.</aside>
     </section>
 
     <!-- ============ SLIDE 2 — AGENDA (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <p class="eyebrow text-[12px] text-primary mb-2">Agenda</p>
-      <h2 class="font-heading font-bold text-[40px] text-ink mb-2">What we'll cover in 20 minutes</h2>
-      <p class="text-ink/55 text-[16px] mb-8 max-w-3xl">Three movements — first the concept, then the blueprint, then the concrete ask.</p>
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Agenda" style="background:#FAF9FE;">
+      <p class="kicker text-primary mb-2">Agenda</p>
+      <h2 class="font-heading font-bold text-[40px] text-ink mb-2">What we'll cover</h2>
+      <p class="text-ink/55 text-[16px] mb-8 max-w-3xl">Three movements — the concept in plain terms, the engineering blueprint, then the concrete ask and plan.</p>
 
       <div class="grid grid-cols-3 gap-6">
-        <div class="card rounded-2xl bg-white p-7">
-          <div class="zbadge w-11 h-11 rounded-xl text-white text-lg mb-4" style="background:#5B3FD6;">1</div>
-          <h3 class="font-heading font-semibold text-[20px] text-ink mb-3">Understand</h3>
+        <div class="card accent-top p-7" style="--ac:#5B3FD6;">
+          <div class="zicon w-12 h-12 mb-4 text-white" style="background:#5B3FD6;"><svg class="ico"><use href="#ic-layers"/></svg></div>
+          <h3 class="font-heading font-semibold text-[20px] text-ink mb-3">1 · Understand</h3>
           <ul class="text-[15px] text-ink/70 space-y-2">
-            <li>• What Apigee X is, in plain terms</li>
-            <li>• Where it sits in your estate</li>
-            <li>• The business value it unlocks</li>
+            <li>• What Apigee X is, simply</li>
+            <li>• The Apigee object model</li>
+            <li>• Where it sits &amp; why it matters</li>
           </ul>
         </div>
-        <div class="card rounded-2xl bg-white p-7">
-          <div class="zbadge w-11 h-11 rounded-xl text-white text-lg mb-4" style="background:#1A73E8;">2</div>
-          <h3 class="font-heading font-semibold text-[20px] text-ink mb-3">Architect</h3>
+        <div class="card accent-top p-7" style="--ac:#1A73E8;">
+          <div class="zicon w-12 h-12 mb-4 text-white" style="background:#1A73E8;"><svg class="ico"><use href="#ic-network"/></svg></div>
+          <h3 class="font-heading font-semibold text-[20px] text-ink mb-3">2 · Architect</h3>
           <ul class="text-[15px] text-ink/70 space-y-2">
             <li>• The Landing Zone Blueprint</li>
-            <li>• The 7 build zones (Z1–Z7)</li>
-            <li>• Checklist mapped to each zone</li>
+            <li>• 7 build zones, zone-by-zone checklist</li>
+            <li>• The provisioning sequence</li>
           </ul>
         </div>
-        <div class="card rounded-2xl bg-white p-7">
-          <div class="zbadge w-11 h-11 rounded-xl text-white text-lg mb-4" style="background:#34A853;">3</div>
-          <h3 class="font-heading font-semibold text-[20px] text-ink mb-3">Mobilize</h3>
+        <div class="card accent-top p-7" style="--ac:#34A853;">
+          <div class="zicon w-12 h-12 mb-4 text-white" style="background:#34A853;"><svg class="ico"><use href="#ic-flag"/></svg></div>
+          <h3 class="font-heading font-semibold text-[20px] text-ink mb-3">3 · Mobilize</h3>
           <ul class="text-[15px] text-ink/70 space-y-2">
             <li>• What we need from you</li>
-            <li>• Roles, timeline &amp; cost drivers</li>
-            <li>• Risks, guardrails &amp; next steps</li>
+            <li>• RACI, timeline &amp; cost drivers</li>
+            <li>• Guardrails, risks &amp; next steps</li>
           </ul>
         </div>
       </div>
 
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Set expectations on cadence. Tell them to hold detailed networking debates for the zone slides — we'll get there. The single most valuable slide for them is #18 (“What we need from you”).</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Set expectations on cadence. Hold detailed networking debates for the zone slides — we'll get there. The single most valuable slide for them is the consolidated pre-requisites near the end. Encourage the right people (network, security, platform) to flag dependencies as we go.</aside>
     </section>
 
     <!-- ============ SLIDE 3 — WHAT IS APIGEE X (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad" style="background:#FFFFFF;">
-      <p class="eyebrow text-[12px] text-primary mb-2">Concept</p>
+    <section class="slide slide-light slide-pad" data-sec="Concept" style="background:#FFFFFF;">
+      <p class="kicker text-primary mb-2">Concept</p>
       <h2 class="font-heading font-bold text-[40px] text-ink mb-2">Apigee X in plain terms</h2>
-      <p class="text-ink/55 text-[16px] mb-7 max-w-4xl">Think of it as a <strong class="text-ink">managed front door</strong> for every digital service you expose — to partners, mobile apps, and internal teams.</p>
+      <p class="text-ink/55 text-[16px] mb-6 max-w-4xl">A <strong class="text-ink">managed front door</strong> for every digital service you expose — to partners, mobile apps, internal teams and AI agents. Security, traffic control and analytics are enforced once, consistently.</p>
 
       <div class="grid grid-cols-12 gap-6 items-center">
         <div class="col-span-7">
           <svg viewBox="0 0 720 300" class="w-full">
             <defs>
               <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#5B3FD6"/></marker>
+              <linearGradient id="gw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6B4DF0"/><stop offset="1" stop-color="#4A2CC4"/></linearGradient>
+              <filter id="sh" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1A1333" flood-opacity="0.18"/></filter>
             </defs>
             <rect x="6" y="60" width="150" height="180" rx="14" fill="#F5F4FB" stroke="#D9D2F5"/>
-            <text x="81" y="50" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="14" fill="#1A1333">Consumers</text>
-            <text x="81" y="100" text-anchor="middle" font-size="13" fill="#473b6b">Mobile / Web</text>
-            <text x="81" y="130" text-anchor="middle" font-size="13" fill="#473b6b">Partners</text>
-            <text x="81" y="160" text-anchor="middle" font-size="13" fill="#473b6b">Internal apps</text>
-            <text x="81" y="190" text-anchor="middle" font-size="13" fill="#473b6b">AI agents</text>
+            <text x="81" y="48" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="14" fill="#1A1333">Consumers</text>
+            <g font-size="13" fill="#473b6b"><text x="81" y="100" text-anchor="middle">Mobile / Web</text><text x="81" y="130" text-anchor="middle">Partners</text><text x="81" y="160" text-anchor="middle">Internal apps</text><text x="81" y="190" text-anchor="middle">AI agents</text></g>
 
-            <rect x="270" y="40" width="180" height="220" rx="16" fill="#5B3FD6"/>
-            <text x="360" y="78" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="16" fill="#fff">Apigee X</text>
-            <text x="360" y="100" text-anchor="middle" font-size="11.5" fill="#D9CCFF">API Gateway</text>
-            <g font-size="12" fill="#EDEBFA">
-              <text x="360" y="135" text-anchor="middle">Security &amp; keys</text>
-              <text x="360" y="162" text-anchor="middle">Traffic &amp; quotas</text>
-              <text x="360" y="189" text-anchor="middle">Transform &amp; route</text>
-              <text x="360" y="216" text-anchor="middle">Analytics</text>
-            </g>
+            <rect x="270" y="40" width="180" height="220" rx="18" fill="url(#gw)" filter="url(#sh)"/>
+            <text x="360" y="76" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="17" fill="#fff">Apigee X</text>
+            <text x="360" y="97" text-anchor="middle" font-size="11.5" fill="#D9CCFF">Managed API Gateway</text>
+            <g font-size="12.5" fill="#EDEBFA"><text x="360" y="132" text-anchor="middle">Security &amp; keys</text><text x="360" y="159" text-anchor="middle">Traffic &amp; quotas</text><text x="360" y="186" text-anchor="middle">Transform &amp; route</text><text x="360" y="213" text-anchor="middle">Analytics</text></g>
 
             <rect x="564" y="60" width="150" height="180" rx="14" fill="#F5F4FB" stroke="#D9D2F5"/>
-            <text x="639" y="50" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="14" fill="#1A1333">Your services</text>
-            <text x="639" y="100" text-anchor="middle" font-size="13" fill="#473b6b">APIs &amp; micro-svcs</text>
-            <text x="639" y="130" text-anchor="middle" font-size="13" fill="#473b6b">Databases</text>
-            <text x="639" y="160" text-anchor="middle" font-size="13" fill="#473b6b">SaaS / on-prem</text>
-            <text x="639" y="190" text-anchor="middle" font-size="13" fill="#473b6b">Legacy systems</text>
+            <text x="639" y="48" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="14" fill="#1A1333">Your services</text>
+            <g font-size="13" fill="#473b6b"><text x="639" y="100" text-anchor="middle">APIs / micro-svcs</text><text x="639" y="130" text-anchor="middle">Databases</text><text x="639" y="160" text-anchor="middle">SaaS / on-prem</text><text x="639" y="190" text-anchor="middle">Legacy systems</text></g>
 
             <line x1="156" y1="150" x2="262" y2="150" stroke="#5B3FD6" stroke-width="2.5" marker-end="url(#ar)"/>
             <line x1="450" y1="150" x2="556" y2="150" stroke="#5B3FD6" stroke-width="2.5" marker-end="url(#ar)"/>
           </svg>
         </div>
         <div class="col-span-5 space-y-3">
-          <div class="card rounded-xl bg-surface p-4"><strong class="text-primary font-heading">API</strong><span class="text-ink/70 text-[14.5px]"> — a contract that lets one system safely use another's data or function.</span></div>
-          <div class="card rounded-xl bg-surface p-4"><strong class="text-primary font-heading">Proxy</strong><span class="text-ink/70 text-[14.5px]"> — Apigee's managed “middleman” in front of each backend; you change the proxy, not the backend.</span></div>
-          <div class="card rounded-xl bg-surface p-4"><strong class="text-primary font-heading">Gateway</strong><span class="text-ink/70 text-[14.5px]"> — the single, policed entry point where security, limits, and monitoring are enforced consistently.</span></div>
+          <div class="card-soft p-4"><strong class="text-primary font-heading">API</strong><span class="text-ink/70 text-[14.5px]"> — a contract that lets one system safely use another's data or function.</span></div>
+          <div class="card-soft p-4"><strong class="text-primary font-heading">Proxy</strong><span class="text-ink/70 text-[14.5px]"> — Apigee's managed façade in front of each backend; you evolve the proxy, not the backend.</span></div>
+          <div class="card-soft p-4"><strong class="text-primary font-heading">Policy</strong><span class="text-ink/70 text-[14.5px]"> — a reusable rule (auth, quota, mediation) attached to a proxy to enforce behaviour without code.</span></div>
         </div>
       </div>
 
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Use the “managed front door / reception desk” analogy. Reception checks ID (auth), enforces appointment limits (quotas/rate-limit), translates languages (mediation), and keeps a visitor log (analytics). Stress: backends don't have to change — the proxy absorbs that.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Use the “reception desk” analogy: checks ID (auth), enforces appointment limits (quota / spike arrest), translates languages (mediation), keeps a visitor log (analytics). Stress that backends don't change — the proxy absorbs it. A “policy” is the unit of enforcement, configured not coded.</aside>
     </section>
 
     <!-- ============ SLIDE 4 — WHY IT MATTERS (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <p class="eyebrow text-[12px] text-primary mb-2">Business value</p>
-      <h2 class="font-heading font-bold text-[40px] text-ink mb-7">Why a managed gateway, not point-to-point</h2>
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Concept" style="background:#FAF9FE;">
+      <p class="kicker text-primary mb-2">Business value</p>
+      <h2 class="font-heading font-bold text-[40px] text-ink mb-6">Why a managed gateway, not point-to-point</h2>
 
       <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-white p-6">
+        <div class="card p-6" style="border-left:4px solid #EA4335;">
           <h3 class="font-heading font-semibold text-[18px] text-coral mb-4">Without a gateway</h3>
           <ul class="space-y-2.5 text-[15px] text-ink/70">
             <li>✗ Security re-implemented per app — inconsistent</li>
@@ -254,10 +294,10 @@
             <li>✗ Partner onboarding is bespoke &amp; slow</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#efeaff,#ffffff);">
+        <div class="card p-6" style="border-left:4px solid #34A853; background:linear-gradient(160deg,#efeaff,#ffffff);">
           <h3 class="font-heading font-semibold text-[18px] text-accent mb-4">With Apigee X</h3>
           <ul class="space-y-2.5 text-[15px] text-ink/80">
-            <li>✓ <strong>Consistent security</strong> — OAuth, API keys, mTLS, threat protection</li>
+            <li>✓ <strong>Consistent security</strong> — OAuth 2.0, API keys, JWT, mTLS, threat protection</li>
             <li>✓ <strong>Full visibility</strong> — analytics, latency, error &amp; usage insight</li>
             <li>✓ <strong>Decoupling</strong> — evolve backends behind a stable contract</li>
             <li>✓ <strong>Control</strong> — quotas, spike arrest, caching, versioning</li>
@@ -267,392 +307,469 @@
       </div>
 
       <div class="grid grid-cols-4 gap-4 mt-6">
-        <div class="card rounded-xl bg-white p-4 text-center"><div class="font-heading font-bold text-[26px] text-primary">1 door</div><div class="text-[13px] text-ink/55">policy enforced once</div></div>
-        <div class="card rounded-xl bg-white p-4 text-center"><div class="font-heading font-bold text-[26px] text-secondary">Global</div><div class="text-[13px] text-ink/55">multi-region runtime</div></div>
-        <div class="card rounded-xl bg-white p-4 text-center"><div class="font-heading font-bold text-[26px] text-accent">Managed</div><div class="text-[13px] text-ink/55">runtime &amp; control plane</div></div>
-        <div class="card rounded-xl bg-white p-4 text-center"><div class="font-heading font-bold text-[26px] text-amber">Insightful</div><div class="text-[13px] text-ink/55">built-in API analytics</div></div>
+        <div class="card p-4 text-center"><div class="font-heading font-bold text-[26px] text-primary">1 door</div><div class="text-[13px] text-ink/55">policy enforced once</div></div>
+        <div class="card p-4 text-center"><div class="font-heading font-bold text-[26px] text-secondary">Global</div><div class="text-[13px] text-ink/55">multi-region runtime</div></div>
+        <div class="card p-4 text-center"><div class="font-heading font-bold text-[26px] text-accent">Managed</div><div class="text-[13px] text-ink/55">runtime &amp; control plane</div></div>
+        <div class="card p-4 text-center"><div class="font-heading font-bold text-[26px] text-amber">Insightful</div><div class="text-[13px] text-ink/55">built-in API analytics</div></div>
       </div>
 
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Tie to their pain. Ask which of the “without” bullets stings most today — that becomes the anchor use case for the pilot. Note Apigee runtime is Google-managed; their team focuses on policy &amp; APIs, not patching gateways.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Tie to their pain — ask which “without” bullet stings most today; that becomes the anchor use case for the pilot. Note the runtime is Google-managed: their team focuses on policy &amp; APIs, not patching gateways or scaling VMs.</aside>
     </section>
 
-    <!-- ============ SLIDE 5 — REFERENCE ARCHITECTURE (WHITE) ============ -->
-    <section class="slide slide-white slide-pad" style="background:#FFFFFF;">
-      <div class="flex items-end justify-between mb-3">
-        <div>
-          <p class="eyebrow text-[12px] text-primary mb-1">Reference Architecture</p>
-          <h2 class="font-heading font-bold text-[34px] text-ink leading-tight">The “Landing Zone Blueprint” for Apigee X</h2>
+    <!-- ============ SLIDE 5 — APIGEE OBJECT MODEL (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Concept" style="background:#FFFFFF;">
+      <p class="kicker text-primary mb-1">How Apigee is organized</p>
+      <h2 class="font-heading font-bold text-[36px] text-ink mb-1">The Apigee X object model</h2>
+      <p class="text-ink/55 text-[15px] mb-4 max-w-4xl">Four concepts shape everything downstream — routing, promotion, residency and cost. Worth agreeing early.</p>
+
+      <div class="grid grid-cols-12 gap-6 items-center">
+        <div class="col-span-7">
+          <svg viewBox="0 0 760 380" class="w-full" style="max-height:48vh;">
+            <defs><filter id="sh2" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#1A1333" flood-opacity="0.14"/></filter></defs>
+            <!-- Organization -->
+            <rect x="20" y="20" width="720" height="64" rx="14" fill="#EEE9FF" stroke="#5B3FD6" filter="url(#sh2)"/>
+            <text x="40" y="46" font-family="Poppins" font-weight="700" font-size="16" fill="#3a23a0">Organization</text>
+            <text x="40" y="66" font-family="Inter" font-size="12" fill="#6b5bb0">1 : 1 with the GCP project · fixed control-plane / analytics region · subscription entitlements</text>
+            <!-- Environment Groups -->
+            <rect x="20" y="104" width="350" height="120" rx="14" fill="#EAF1FE" stroke="#1A73E8" filter="url(#sh2)"/>
+            <text x="40" y="130" font-family="Poppins" font-weight="700" font-size="15" fill="#0f3c8a">Environment Groups</text>
+            <text x="40" y="150" font-family="Inter" font-size="12" fill="#3a5fa8">route traffic by hostname</text>
+            <rect x="40" y="162" width="140" height="44" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="110" y="183" text-anchor="middle" font-size="11.5" fill="#13357d">api.acme.com</text><text x="110" y="198" text-anchor="middle" font-size="10" fill="#6a86bd">→ prod env</text>
+            <rect x="196" y="162" width="150" height="44" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="271" y="183" text-anchor="middle" font-size="11.5" fill="#13357d">dev.acme.com</text><text x="271" y="198" text-anchor="middle" font-size="10" fill="#6a86bd">→ dev / test env</text>
+            <!-- Instances -->
+            <rect x="390" y="104" width="350" height="120" rx="14" fill="#E8F7ED" stroke="#34A853" filter="url(#sh2)"/>
+            <text x="410" y="130" font-family="Poppins" font-weight="700" font-size="15" fill="#1c6b38">Instances (regional)</text>
+            <text x="410" y="150" font-family="Inter" font-size="12" fill="#3f8a5c">the runtime compute · CMEK-encrypted</text>
+            <rect x="410" y="162" width="140" height="44" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="480" y="183" text-anchor="middle" font-size="11.5" fill="#175c31">Instance · region 1</text><text x="480" y="198" text-anchor="middle" font-size="10" fill="#3f8a5c">primary</text>
+            <rect x="566" y="162" width="150" height="44" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="641" y="183" text-anchor="middle" font-size="11.5" fill="#175c31">Instance · region 2</text><text x="641" y="198" text-anchor="middle" font-size="10" fill="#3f8a5c">HA / DR</text>
+            <!-- Environments -->
+            <rect x="20" y="246" width="720" height="116" rx="14" fill="#F7F5FF" stroke="#B9A6F5" filter="url(#sh2)"/>
+            <text x="40" y="272" font-family="Poppins" font-weight="700" font-size="15" fill="#3a23a0">Environments</text>
+            <text x="40" y="291" font-family="Inter" font-size="12" fill="#6b5bb0">deployment targets — attached to instances; hold API proxies, shared flows, keystores, target servers, KVMs</text>
+            <rect x="40" y="302" width="150" height="44" rx="9" fill="#EEE9FF" stroke="#B9A6F5"/><text x="115" y="329" text-anchor="middle" font-weight="600" font-size="12" fill="#3a23a0">dev</text>
+            <rect x="206" y="302" width="150" height="44" rx="9" fill="#EEE9FF" stroke="#B9A6F5"/><text x="281" y="329" text-anchor="middle" font-weight="600" font-size="12" fill="#3a23a0">test</text>
+            <rect x="372" y="302" width="150" height="44" rx="9" fill="#EEE9FF" stroke="#B9A6F5"/><text x="447" y="329" text-anchor="middle" font-weight="600" font-size="12" fill="#3a23a0">prod</text>
+            <rect x="538" y="302" width="180" height="44" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="628" y="323" text-anchor="middle" font-size="11" fill="#6b5bb0">API proxies · shared flows</text><text x="628" y="338" text-anchor="middle" font-size="10" fill="#8a7bc0">deploy here</text>
+            <!-- connectors -->
+            <line x1="380" y1="84" x2="195" y2="100" stroke="#9b8fce" stroke-width="1.4"/><line x1="380" y1="84" x2="565" y2="100" stroke="#9b8fce" stroke-width="1.4"/>
+            <line x1="195" y1="224" x2="280" y2="242" stroke="#9b8fce" stroke-width="1.4"/><line x1="565" y1="224" x2="450" y2="242" stroke="#9b8fce" stroke-width="1.4"/>
+          </svg>
         </div>
-        <p class="text-ink/45 text-[13px] max-w-xs text-right">Indicative enterprise topology. Each numbered zone maps to a checklist slide that follows.</p>
+        <div class="col-span-5 space-y-3">
+          <div class="card-soft p-4"><strong class="text-primary font-heading text-[15px]">Organization</strong><p class="text-ink/70 text-[14px] mt-1">Bound 1:1 to the project; its control-plane region and subscription are effectively permanent. <span class="mono">apigee.googleapis.com/organizations</span></p></div>
+          <div class="card-soft p-4"><strong class="text-secondary font-heading text-[15px]">Env Group ↔ hostname</strong><p class="text-ink/70 text-[14px] mt-1">Determines DNS &amp; load-balancer routing — design before building ingress.</p></div>
+          <div class="card-soft p-4"><strong class="text-accent font-heading text-[15px]">Instance ↔ Environment</strong><p class="text-ink/70 text-[14px] mt-1">Instances are regional compute; environments are deployment scopes attached to them. Multi-region = attach to 2+ instances.</p></div>
+        </div>
       </div>
 
-      <div class="card rounded-2xl p-3" style="background:#FBFAFF;">
-        <svg viewBox="0 0 1460 660" class="w-full" style="max-height:70vh;">
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> This model drives later decisions: env groups → DNS/LB hostnames; environments → promotion model and config-as-code; instances → regions, HA and cost. The org's region and subscription tier can't be changed later without re-provisioning, so lock them in discovery.</aside>
+    </section>
+
+    <!-- ============ SLIDE 6 — REFERENCE ARCHITECTURE (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Architecture" style="background:#FFFFFF;">
+      <div class="flex items-end justify-between mb-2">
+        <div>
+          <p class="kicker text-primary mb-1">Reference Architecture</p>
+          <h2 class="font-heading font-bold text-[32px] text-ink leading-tight">The “Landing Zone Blueprint” for Apigee X</h2>
+        </div>
+        <p class="text-ink/45 text-[12.5px] max-w-xs text-right">Indicative enterprise topology. Each numbered zone maps to a checklist slide that follows.</p>
+      </div>
+
+      <div class="card p-3" style="background:#FBFAFF;">
+        <svg viewBox="0 0 1480 640" class="w-full" style="max-height:68vh;">
           <defs>
             <marker id="a2" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#5B3FD6"/></marker>
             <marker id="a3" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#1A73E8"/></marker>
+            <marker id="a4" markerWidth="10" markerHeight="10" refX="7" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 Z" fill="#34A853"/></marker>
+            <filter id="ds" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="2.5" stdDeviation="4" flood-color="#1A1333" flood-opacity="0.13"/></filter>
+            <linearGradient id="z4g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#EAF1FE"/><stop offset="1" stop-color="#DCE9FF"/></linearGradient>
+            <linearGradient id="z3g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1ECFF"/><stop offset="1" stop-color="#E6DBFF"/></linearGradient>
+            <linearGradient id="z2g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E8F7ED"/><stop offset="1" stop-color="#DBF3E3"/></linearGradient>
+            <linearGradient id="z5g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF6E5"/><stop offset="1" stop-color="#FFEFCC"/></linearGradient>
           </defs>
 
           <!-- CONSUMERS -->
-          <rect x="20" y="70" width="150" height="300" rx="14" fill="#fff" stroke="#D9D2F5"/>
-          <text x="95" y="58" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="14" fill="#1A1333">Consumers</text>
-          <g font-size="12.5" fill="#473b6b" font-family="Inter">
-            <text x="95" y="120" text-anchor="middle">External devs</text>
-            <text x="95" y="160" text-anchor="middle">Partners</text>
-            <text x="95" y="200" text-anchor="middle">Mobile / Web</text>
-            <text x="95" y="240" text-anchor="middle">Internal apps</text>
-            <text x="95" y="300" text-anchor="middle" fill="#8a82a8">Dev Portal</text>
+          <rect x="18" y="64" width="146" height="300" rx="14" fill="#fff" stroke="#D9D2F5" filter="url(#ds)"/>
+          <text x="91" y="52" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="13.5" fill="#1A1333">Consumers</text>
+          <g font-size="12" fill="#473b6b"><text x="91" y="112" text-anchor="middle">External devs</text><text x="91" y="150" text-anchor="middle">Partners</text><text x="91" y="188" text-anchor="middle">Mobile / Web</text><text x="91" y="226" text-anchor="middle">Internal apps</text><text x="91" y="290" text-anchor="middle" fill="#8a82a8">Developer Portal</text></g>
+
+          <!-- Z4 -->
+          <rect x="200" y="44" width="268" height="340" rx="16" fill="url(#z4g)" stroke="#1A73E8" stroke-width="1.4" filter="url(#ds)"/>
+          <rect x="212" y="32" width="42" height="25" rx="8" fill="#1A73E8"/><text x="233" y="49" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12.5" fill="#fff">Z4</text>
+          <text x="352" y="49" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13" fill="#0f3c8a">Northbound Ingress</text>
+          <g font-family="Inter" font-size="12" fill="#13357d">
+            <rect x="216" y="72" width="236" height="40" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="334" y="92" text-anchor="middle">Cloud DNS → public hostname</text><text x="334" y="105" text-anchor="middle" font-size="9.5" fill="#5b7bb8">A/AAAA → LB anycast VIP</text>
+            <rect x="216" y="120" width="236" height="40" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="334" y="140" text-anchor="middle">Global External App LB</text><text x="334" y="153" text-anchor="middle" font-size="9.5" fill="#5b7bb8">HTTPS 443 · managed TLS cert</text>
+            <rect x="216" y="168" width="236" height="38" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="334" y="192" text-anchor="middle">Cloud Armor — WAF / DDoS</text>
+            <rect x="216" y="214" width="236" height="38" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="334" y="232" text-anchor="middle">Health checks</text><text x="334" y="245" text-anchor="middle" font-size="9.5" fill="#5b7bb8">130.211.0.0/22 · 35.191.0.0/16</text>
+            <rect x="216" y="260" width="236" height="46" rx="9" fill="#DCE9FF" stroke="#1A73E8"/><text x="334" y="281" text-anchor="middle" font-weight="600">PSC NEG → Service Attachment</text><text x="334" y="296" text-anchor="middle" font-size="9.5" fill="#3a5fa8">PRIVATE_SERVICE_CONNECT · region-matched</text>
           </g>
 
-          <!-- Z4 EDGE / NORTHBOUND -->
-          <rect x="210" y="50" width="270" height="340" rx="16" fill="#EAF1FE" stroke="#1A73E8" stroke-width="1.5"/>
-          <rect x="222" y="38" width="44" height="26" rx="8" fill="#1A73E8"/><text x="244" y="56" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="13" fill="#fff">Z4</text>
-          <text x="360" y="56" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13.5" fill="#0f3c8a">Northbound Ingress</text>
-          <g font-family="Inter" font-size="12.5" fill="#13357d">
-            <rect x="228" y="80" width="234" height="42" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="345" y="106" text-anchor="middle">Cloud DNS → public hostname</text>
-            <rect x="228" y="132" width="234" height="42" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="345" y="158" text-anchor="middle">Global External App LB</text>
-            <rect x="228" y="184" width="234" height="42" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="345" y="210" text-anchor="middle">Cloud Armor (WAF / DDoS)</text>
-            <rect x="228" y="236" width="234" height="42" rx="9" fill="#fff" stroke="#9DBDF5"/><text x="345" y="262" text-anchor="middle">Google-managed TLS cert</text>
-            <rect x="228" y="288" width="234" height="46" rx="9" fill="#DCE9FF" stroke="#1A73E8"/><text x="345" y="310" text-anchor="middle" font-weight="600">PSC NEG → Service Attachment</text><text x="345" y="326" text-anchor="middle" font-size="11" fill="#3a5fa8">private, no public runtime IP</text>
+          <!-- Z3 -->
+          <rect x="500" y="44" width="306" height="340" rx="16" fill="url(#z3g)" stroke="#5B3FD6" stroke-width="1.5" filter="url(#ds)"/>
+          <rect x="512" y="32" width="42" height="25" rx="8" fill="#5B3FD6"/><text x="533" y="49" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12.5" fill="#fff">Z3</text>
+          <text x="668" y="49" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13" fill="#3a23a0">Apigee X Runtime</text>
+          <text x="653" y="70" text-anchor="middle" font-size="10" fill="#6b5bb0">Google-managed tenant project</text>
+          <g font-family="Inter" font-size="12" fill="#2e1d7a">
+            <rect x="516" y="80" width="274" height="40" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="653" y="100" text-anchor="middle" font-weight="600">Apigee Organization (1:1 project)</text><text x="653" y="113" text-anchor="middle" font-size="9.5" fill="#6b5bb0">control region · subscription tier</text>
+            <rect x="516" y="128" width="132" height="76" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="582" y="150" text-anchor="middle" font-weight="600">Instance A</text><text x="582" y="168" text-anchor="middle" font-size="10" fill="#6b5bb0">region 1</text><text x="582" y="184" text-anchor="middle" font-size="9.5" fill="#6b5bb0">CMEK disk key</text>
+            <rect x="658" y="128" width="132" height="76" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="724" y="150" text-anchor="middle" font-weight="600">Instance B</text><text x="724" y="168" text-anchor="middle" font-size="10" fill="#6b5bb0">region 2 · HA/DR</text><text x="724" y="184" text-anchor="middle" font-size="9.5" fill="#6b5bb0">CMEK disk key</text>
+            <rect x="516" y="212" width="274" height="40" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="653" y="232" text-anchor="middle" font-weight="600">Environment Groups → hostnames</text>
+            <rect x="516" y="260" width="274" height="46" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="653" y="281" text-anchor="middle" font-weight="600">Environments → API proxies</text><text x="653" y="296" text-anchor="middle" font-size="9.5" fill="#6b5bb0">dev · test · prod · shared flows</text>
           </g>
 
-          <!-- Z3 APIGEE RUNTIME -->
-          <rect x="520" y="50" width="300" height="340" rx="16" fill="#EEE9FF" stroke="#5B3FD6" stroke-width="1.6"/>
-          <rect x="532" y="38" width="44" height="26" rx="8" fill="#5B3FD6"/><text x="554" y="56" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="13" fill="#fff">Z3</text>
-          <text x="685" y="56" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13.5" fill="#3a23a0">Apigee X Runtime</text>
-          <text x="670" y="80" text-anchor="middle" font-size="10.5" fill="#6b5bb0">Google-managed tenant project</text>
-          <g font-family="Inter" font-size="12.5" fill="#2e1d7a">
-            <rect x="538" y="92" width="264" height="44" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="670" y="113" text-anchor="middle" font-weight="600">Apigee Organization (1 : 1 project)</text><text x="670" y="129" text-anchor="middle" font-size="10.5" fill="#6b5bb0">analytics region · billing tier</text>
-            <rect x="538" y="146" width="126" height="80" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="601" y="170" text-anchor="middle" font-weight="600">Instance A</text><text x="601" y="190" text-anchor="middle" font-size="11" fill="#6b5bb0">region 1</text><text x="601" y="210" text-anchor="middle" font-size="11" fill="#6b5bb0">CMEK-encrypted</text>
-            <rect x="676" y="146" width="126" height="80" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="739" y="170" text-anchor="middle" font-weight="600">Instance B</text><text x="739" y="190" text-anchor="middle" font-size="11" fill="#6b5bb0">region 2 (HA/DR)</text><text x="739" y="210" text-anchor="middle" font-size="11" fill="#6b5bb0">CMEK-encrypted</text>
-            <rect x="538" y="236" width="264" height="44" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="670" y="257" text-anchor="middle" font-weight="600">Environment Groups → hostnames</text><text x="670" y="273" text-anchor="middle" font-size="10.5" fill="#6b5bb0">route traffic by domain</text>
-            <rect x="538" y="290" width="264" height="44" rx="9" fill="#fff" stroke="#B9A6F5"/><text x="670" y="311" text-anchor="middle" font-weight="600">Environments → API proxies</text><text x="670" y="327" text-anchor="middle" font-size="10.5" fill="#6b5bb0">dev · test · prod</text>
+          <!-- peering connector -->
+          <line x1="653" y1="384" x2="653" y2="424" stroke="#5B3FD6" stroke-width="2.5" stroke-dasharray="5 4"/>
+          <text x="668" y="410" font-size="11" font-family="Inter" fill="#5B3FD6">VPC Peering — PSA /22 + /28</text>
+
+          <!-- Z2 -->
+          <rect x="500" y="424" width="546" height="150" rx="16" fill="url(#z2g)" stroke="#34A853" stroke-width="1.5" filter="url(#ds)"/>
+          <rect x="512" y="412" width="42" height="25" rx="8" fill="#34A853"/><text x="533" y="429" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12.5" fill="#fff">Z2</text>
+          <text x="688" y="429" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13" fill="#1c6b38">Customer Host VPC — Shared VPC</text>
+          <g font-family="Inter" font-size="11.5" fill="#175c31">
+            <rect x="514" y="442" width="162" height="50" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="595" y="463" text-anchor="middle" font-weight="600">PSA range /22 + /28</text><text x="595" y="479" text-anchor="middle" font-size="9.5" fill="#3f8a5c">reserved, non-overlapping</text>
+            <rect x="684" y="442" width="162" height="50" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="765" y="463" text-anchor="middle" font-weight="600">Subnets · Routes</text><text x="765" y="479" text-anchor="middle" font-size="9.5" fill="#3f8a5c">Private Google Access</text>
+            <rect x="854" y="442" width="180" height="50" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="944" y="463" text-anchor="middle" font-weight="600">Cloud Router + NAT</text><text x="944" y="479" text-anchor="middle" font-size="9.5" fill="#3f8a5c">controlled egress</text>
+            <rect x="514" y="500" width="520" height="46" rx="9" fill="#F3FBF6" stroke="#9FD9B2"/><text x="774" y="520" text-anchor="middle" font-weight="600">Firewall rules · Private DNS zones · health-check allow-lists</text><text x="774" y="535" text-anchor="middle" font-size="9.5" fill="#3f8a5c">no overlap with on-prem or peered VPCs</text>
           </g>
 
-          <!-- peering connector Z3<->Z2 -->
-          <line x1="670" y1="390" x2="670" y2="430" stroke="#5B3FD6" stroke-width="2.5" stroke-dasharray="5 4"/>
-          <text x="690" y="416" font-size="11.5" font-family="Inter" fill="#5B3FD6">VPC Peering (PSA)</text>
-
-          <!-- Z2 HOST VPC -->
-          <rect x="520" y="430" width="540" height="160" rx="16" fill="#E8F7ED" stroke="#34A853" stroke-width="1.6"/>
-          <rect x="532" y="418" width="44" height="26" rx="8" fill="#34A853"/><text x="554" y="436" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="13" fill="#fff">Z2</text>
-          <text x="700" y="436" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13.5" fill="#1c6b38">Customer Host VPC — Shared VPC</text>
-          <g font-family="Inter" font-size="12" fill="#175c31">
-            <rect x="536" y="450" width="160" height="56" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="616" y="472" text-anchor="middle" font-weight="600">PSA range /22</text><text x="616" y="492" text-anchor="middle" font-size="10.5" fill="#3f8a5c">reserved for Apigee</text>
-            <rect x="704" y="450" width="160" height="56" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="784" y="472" text-anchor="middle" font-weight="600">Subnets · Routes</text><text x="784" y="492" text-anchor="middle" font-size="10.5" fill="#3f8a5c">prod / non-prod</text>
-            <rect x="872" y="450" width="172" height="56" rx="9" fill="#fff" stroke="#9FD9B2"/><text x="958" y="472" text-anchor="middle" font-weight="600">Cloud Router + NAT</text><text x="958" y="492" text-anchor="middle" font-size="10.5" fill="#3f8a5c">controlled egress</text>
-            <rect x="536" y="518" width="508" height="56" rx="9" fill="#F3FBF6" stroke="#9FD9B2"/><text x="790" y="540" text-anchor="middle" font-weight="600">Firewall rules · Private DNS · /28 troubleshoot range</text><text x="790" y="558" text-anchor="middle" font-size="10.5" fill="#3f8a5c">non-overlapping with on-prem &amp; other VPCs</text>
+          <!-- Z5 -->
+          <rect x="1082" y="44" width="380" height="530" rx="16" fill="url(#z5g)" stroke="#E8A400" stroke-width="1.4" filter="url(#ds)"/>
+          <rect x="1094" y="32" width="42" height="25" rx="8" fill="#E8A400"/><text x="1115" y="49" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12.5" fill="#fff">Z5</text>
+          <text x="1272" y="49" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13" fill="#8a6200">Southbound — Backends</text>
+          <g font-family="Inter" font-size="12" fill="#6e4f00">
+            <rect x="1098" y="72" width="348" height="54" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1272" y="94" text-anchor="middle" font-weight="600">GKE / Cloud Run / Compute</text><text x="1272" y="112" text-anchor="middle" font-size="9.5" fill="#a17a14">in-cloud microservices · target servers</text>
+            <rect x="1098" y="136" width="348" height="54" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1272" y="158" text-anchor="middle" font-weight="600">PSC → published / SaaS services</text><text x="1272" y="176" text-anchor="middle" font-size="9.5" fill="#a17a14">private consumption endpoints</text>
+            <rect x="1098" y="200" width="348" height="68" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1272" y="226" text-anchor="middle" font-weight="600">On-prem / Data center</text><text x="1272" y="246" text-anchor="middle" font-size="10" fill="#a17a14">Cloud Interconnect / HA VPN · Cloud Router BGP</text>
+            <rect x="1098" y="278" width="348" height="54" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1272" y="300" text-anchor="middle" font-weight="600">Legacy &amp; 3rd-party APIs</text><text x="1272" y="318" text-anchor="middle" font-size="9.5" fill="#a17a14">mTLS keystores · IP allow-listed</text>
           </g>
 
-          <!-- Z5 BACKENDS -->
-          <rect x="1100" y="50" width="340" height="540" rx="16" fill="#FFF6E5" stroke="#E8A400" stroke-width="1.5"/>
-          <rect x="1112" y="38" width="44" height="26" rx="8" fill="#E8A400"/><text x="1134" y="56" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="13" fill="#fff">Z5</text>
-          <text x="1270" y="56" text-anchor="middle" font-family="Poppins" font-weight="600" font-size="13.5" fill="#8a6200">Southbound — Backends</text>
-          <g font-family="Inter" font-size="12.5" fill="#6e4f00">
-            <rect x="1116" y="80" width="308" height="56" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1270" y="103" text-anchor="middle" font-weight="600">GKE / Cloud Run / Compute</text><text x="1270" y="121" text-anchor="middle" font-size="10.5" fill="#a17a14">in-cloud microservices</text>
-            <rect x="1116" y="146" width="308" height="56" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1270" y="169" text-anchor="middle" font-weight="600">PSC to published / SaaS services</text><text x="1270" y="187" text-anchor="middle" font-size="10.5" fill="#a17a14">private consumption</text>
-            <rect x="1116" y="212" width="308" height="70" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1270" y="240" text-anchor="middle" font-weight="600">On-prem / Data center</text><text x="1270" y="262" text-anchor="middle" font-size="11" fill="#a17a14">via Interconnect or HA VPN</text>
-            <rect x="1116" y="300" width="308" height="56" rx="9" fill="#fff" stroke="#F0CF7E"/><text x="1270" y="323" text-anchor="middle" font-weight="600">Legacy &amp; 3rd-party APIs</text><text x="1270" y="341" text-anchor="middle" font-size="10.5" fill="#a17a14">mTLS / allow-listed</text>
-          </g>
+          <!-- arrows -->
+          <line x1="164" y1="200" x2="196" y2="200" stroke="#5B3FD6" stroke-width="2.5" marker-end="url(#a2)"/>
+          <line x1="468" y1="214" x2="498" y2="214" stroke="#1A73E8" stroke-width="2.5" marker-end="url(#a3)"/>
+          <path d="M944 492 C 1030 492, 1050 280, 1078 240" fill="none" stroke="#34A853" stroke-width="2.5" marker-end="url(#a4)"/>
+          <text x="1000" y="430" font-size="10.5" font-family="Inter" fill="#1c6b38">routed egress → backends</text>
 
-          <!-- arrows main flow -->
-          <line x1="170" y1="200" x2="206" y2="200" stroke="#5B3FD6" stroke-width="2.5" marker-end="url(#a2)"/>
-          <line x1="480" y1="220" x2="516" y2="220" stroke="#1A73E8" stroke-width="2.5" marker-end="url(#a3)"/>
-          <path d="M958 506 C 1040 506, 1060 300, 1096 250" fill="none" stroke="#34A853" stroke-width="2.5" marker-end="url(#a2)"/>
-          <text x="1010" y="430" font-size="11" font-family="Inter" fill="#1c6b38">routed egress → backends</text>
+          <!-- bottom cross-cutting bands -->
+          <rect x="18" y="592" width="470" height="38" rx="10" fill="#F1ECFF" stroke="#5B3FD6"/>
+          <rect x="22" y="598" width="36" height="26" rx="7" fill="#5B3FD6"/><text x="40" y="616" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11.5" fill="#fff">Z1</text>
+          <text x="276" y="616" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#3a23a0">Foundation &amp; Identity — Org · Folders · Projects · IAM · Billing</text>
 
-          <!-- BOTTOM CROSS-CUTTING BANDS Z1 / Z6 / Z7 -->
-          <rect x="20" y="610" width="455" height="40" rx="10" fill="#F1ECFF" stroke="#5B3FD6"/>
-          <rect x="24" y="616" width="38" height="28" rx="7" fill="#5B3FD6"/><text x="43" y="635" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12" fill="#fff">Z1</text>
-          <text x="270" y="635" text-anchor="middle" font-family="Inter" font-size="12.5" font-weight="600" fill="#3a23a0">Foundation &amp; Identity — Org · Folders · Projects · IAM · Billing</text>
+          <rect x="500" y="592" width="470" height="38" rx="10" fill="#FDEEEC" stroke="#EA4335"/>
+          <rect x="504" y="598" width="36" height="26" rx="7" fill="#EA4335"/><text x="522" y="616" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11.5" fill="#fff">Z6</text>
+          <text x="752" y="616" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#a11d10">Security &amp; Governance — CMEK · VPC-SC · Org Policy · Secret Mgr</text>
 
-          <rect x="487" y="610" width="455" height="40" rx="10" fill="#FDEEEC" stroke="#EA4335"/>
-          <rect x="491" y="616" width="38" height="28" rx="7" fill="#EA4335"/><text x="510" y="635" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12" fill="#fff">Z6</text>
-          <text x="730" y="635" text-anchor="middle" font-family="Inter" font-size="12.5" font-weight="600" fill="#a11d10">Security &amp; Governance — KMS/CMEK · VPC-SC · Org Policy · Secret Mgr</text>
-
-          <rect x="954" y="610" width="486" height="40" rx="10" fill="#FFF6E5" stroke="#E8A400"/>
-          <rect x="958" y="616" width="38" height="28" rx="7" fill="#E8A400"/><text x="977" y="635" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="12" fill="#fff">Z7</text>
-          <text x="1215" y="635" text-anchor="middle" font-family="Inter" font-size="12.5" font-weight="600" fill="#8a6200">Observability — Cloud Monitoring · Logging · API Analytics · Alerting</text>
+          <rect x="982" y="592" width="480" height="38" rx="10" fill="#FFF6E5" stroke="#E8A400"/>
+          <rect x="986" y="598" width="36" height="26" rx="7" fill="#E8A400"/><text x="1004" y="616" text-anchor="middle" font-family="Poppins" font-weight="700" font-size="11.5" fill="#fff">Z7</text>
+          <text x="1240" y="616" text-anchor="middle" font-family="Inter" font-size="12" font-weight="600" fill="#8a6200">Observability — Monitoring · Logging · Analytics · Alerting</text>
         </svg>
       </div>
 
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Walk left-to-right: consumer hits a public hostname (DNS) → Global LB + Cloud Armor → PSC NEG privately reaches the Apigee runtime (no public runtime IP) → Apigee runs in a Google-managed tenant project peered to their VPC via a reserved /22 → from the VPC, traffic routes south to backends (in-cloud, PSC, or on-prem via Interconnect/VPN). Z1/Z6/Z7 are cross-cutting bands that touch everything. Tell them: every numbered zone has its own checklist slide next.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Walk left→right: consumer hits a public hostname (DNS) → Global External ALB on 443 with a managed cert and Cloud Armor → a PSC NEG privately reaches the Apigee runtime's service attachment (no public runtime IP). The runtime sits in a Google-managed tenant project peered to their VPC via a reserved /22+/28. From the VPC, traffic routes south to backends — in-cloud, via PSC, or on-prem over Interconnect/HA VPN with BGP. Z1/Z6/Z7 are cross-cutting. Note the LB health-check ranges that must be allow-listed. Every numbered zone has its own checklist next.</aside>
     </section>
 
-    <!-- ============ SLIDE 6 — THE 7 ZONES (DARK DIVIDER) ============ -->
-    <section class="slide slide-dark slide-pad bg-grid-dark" style="background:radial-gradient(900px 500px at 20% 20%, #2a1d63 0%, #150E2E 60%);">
-      <p class="eyebrow text-[12px] text-amber mb-2">How to read the checklist</p>
+    <!-- ============ SLIDE 7 — THE 7 ZONES (DARK DIVIDER) ============ -->
+    <section class="slide slide-dark slide-pad bg-grid-dark" data-sec="Architecture" style="background:radial-gradient(900px 520px at 18% 18%, #2c1f6a 0%, #160F31 58%);">
+      <div class="blob" style="width:360px;height:360px;background:#5B3FD6;bottom:-120px;right:6%;opacity:.4;"></div>
+      <p class="kicker text-amber mb-2">How to read the checklist</p>
       <h2 class="font-heading font-bold text-[40px] text-white mb-2">The 7 build zones</h2>
-      <p class="text-white/55 text-[16px] mb-7 max-w-3xl">Each zone is a slide with two columns — <span class="text-white">what we configure</span> and <span class="text-amber">what we need from you</span>.</p>
+      <p class="text-white/55 text-[16px] mb-7 max-w-3xl">Each zone is a slide with two columns — <span class="text-white">what we configure</span> (with the actual GCP resources) and <span class="text-amber">what we need from you</span>.</p>
 
-      <div class="grid grid-cols-2 gap-x-10 gap-y-3.5">
-        <div class="flex items-center gap-4"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#5B3FD6;">Z1</span><span class="text-white/85 text-[16px]"><strong>Foundation &amp; Identity</strong> — projects, IAM, billing, APIs</span></div>
-        <div class="flex items-center gap-4"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#34A853;">Z2</span><span class="text-white/85 text-[16px]"><strong>Networking &amp; VPC</strong> — Shared VPC, PSA /22, NAT</span></div>
-        <div class="flex items-center gap-4"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#5B3FD6;">Z3</span><span class="text-white/85 text-[16px]"><strong>Apigee Runtime</strong> — org, instances, env groups</span></div>
-        <div class="flex items-center gap-4"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#1A73E8;">Z4</span><span class="text-white/85 text-[16px]"><strong>Northbound Ingress</strong> — LB, PSC, Armor, certs, DNS</span></div>
-        <div class="flex items-center gap-4"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#E8A400;">Z5</span><span class="text-white/85 text-[16px]"><strong>Southbound Connectivity</strong> — backends, on-prem</span></div>
-        <div class="flex items-center gap-4"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#EA4335;">Z6</span><span class="text-white/85 text-[16px]"><strong>Security &amp; Governance</strong> — KMS, VPC-SC, policy</span></div>
-        <div class="flex items-center gap-4 col-span-2"><span class="zbadge w-9 h-9 rounded-lg text-white" style="background:#E8A400;">Z7</span><span class="text-white/85 text-[16px]"><strong>Observability &amp; Operations</strong> — monitoring, logging, analytics, alerting</span></div>
+      <div class="grid grid-cols-2 gap-x-9 gap-y-3.5 relative z-10">
+        <div class="flex items-center gap-4"><span class="zicon w-11 h-11 text-white" style="background:#5B3FD6;"><svg class="ico ico-sm"><use href="#ic-foundation"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z1 · Foundation &amp; Identity</strong> — projects, IAM, billing, APIs</span></div>
+        <div class="flex items-center gap-4"><span class="zicon w-11 h-11 text-white" style="background:#34A853;"><svg class="ico ico-sm"><use href="#ic-network"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z2 · Networking &amp; VPC</strong> — Shared VPC, PSA /22, NAT</span></div>
+        <div class="flex items-center gap-4"><span class="zicon w-11 h-11 text-white" style="background:#5B3FD6;"><svg class="ico ico-sm"><use href="#ic-runtime"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z3 · Apigee Runtime</strong> — org, instances, env groups, CMEK</span></div>
+        <div class="flex items-center gap-4"><span class="zicon w-11 h-11 text-white" style="background:#1A73E8;"><svg class="ico ico-sm"><use href="#ic-globe"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z4 · Northbound Ingress</strong> — LB, PSC, Armor, certs, DNS</span></div>
+        <div class="flex items-center gap-4"><span class="zicon w-11 h-11 text-white" style="background:#E8A400;"><svg class="ico ico-sm"><use href="#ic-server"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z5 · Southbound Connectivity</strong> — backends, on-prem</span></div>
+        <div class="flex items-center gap-4"><span class="zicon w-11 h-11 text-white" style="background:#EA4335;"><svg class="ico ico-sm"><use href="#ic-shield"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z6 · Security &amp; Governance</strong> — KMS, VPC-SC, policy</span></div>
+        <div class="flex items-center gap-4 col-span-2"><span class="zicon w-11 h-11 text-white" style="background:#E8A400;"><svg class="ico ico-sm"><use href="#ic-eye"/></svg></span><span class="text-white/85 text-[15.5px]"><strong>Z7 · Observability &amp; Operations</strong> — monitoring, logging, analytics, alerting</span></div>
       </div>
 
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> This is the map of the next 7 slides. Reassure non-technical stakeholders: they don't need to action every zone — most config is ours; their job is to supply inputs and approvals, which is the right-hand amber column each time.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> The map for the next seven slides. Reassure non-technical stakeholders: they don't action every zone — most config is ours. Their job is the amber column: inputs and approvals. Two zones they genuinely own are networking (the CIDR) and southbound (their backends).</aside>
     </section>
 
-    <!-- ============ SLIDE 7 — Z1 FOUNDATION (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad" style="background:#FFFFFF;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#5B3FD6;">Z1</span><h2 class="font-heading font-bold text-[34px] text-ink">Foundation &amp; Identity</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">The GCP “home” for Apigee — projects, access, billing, and enabled services.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-surface p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-primary mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Dedicated Apigee project under the right folder</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Enable APIs: Apigee, Compute, Service Networking, KMS</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>IAM roles &amp; service accounts (least-privilege)</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Provisioning identity with Apigee Org Admin</li>
+    <!-- ============ SLIDE 8 — Z1 FOUNDATION (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad" data-sec="Z1 · Foundation" style="background:#FFFFFF;">
+      <div class="watermark">Z1</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#5B3FD6;"><svg class="ico"><use href="#ic-foundation"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z1 · Foundation &amp; Identity</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">The GCP “home” for Apigee — projects, access, billing, and enabled services.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card-soft p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-primary mb-3 flex items-center gap-2"><svg class="ico ico-sm text-primary"><use href="#ic-list"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Dedicated Apigee project under the landing-zone folder; labels/tags</li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Enable <span class="mono">apigee</span> <span class="mono">compute</span> <span class="mono">servicenetworking</span> <span class="mono">cloudkms</span></li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Provisioning roles <span class="mono">apigee.admin</span> <span class="mono">compute.networkAdmin</span></li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Apigee service agent <span class="mono">…@gcp-sa-apigee</span> role binding</li>
             <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Quota &amp; resource-limit review</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Billing account ID &amp; budget owner</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Folder / project naming &amp; tagging standards</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Who approves IAM bindings? (PIM / approval flow)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Identity source — Cloud Identity / federated SSO?</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Apigee subscription tier (Std / Ent / Ent Plus / PAYG)</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Billing account ID &amp; budget owner</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Folder / project naming &amp; tagging standards</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Who approves IAM bindings? (PAM / just-in-time)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Identity source — Cloud Identity / federated SSO?</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Subscription tier — Std / Ent / Ent Plus / PAYG</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Emphasize one Apigee org = one GCP project, and it's effectively permanent — so naming/folder placement matters now. Flag that the provisioning identity needs elevated roles temporarily; agree an approval path early so we're not blocked on day one.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> One Apigee org = one project, and it's effectively permanent — folder placement and naming matter now. The provisioning identity needs elevated roles temporarily; agree a just-in-time / PAM path so we're not blocked on day one. The Apigee service agent is auto-created on API enablement but needs explicit grants for CMEK later.</aside>
     </section>
 
-    <!-- ============ SLIDE 8 — Z2 NETWORKING (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#34A853;">Z2</span><h2 class="font-heading font-bold text-[34px] text-ink">Networking &amp; VPC</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">Apigee runs in a Google-managed project peered to your VPC — addressing must be planned carefully.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-white p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-accent mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Shared VPC (host + service projects) attach</li>
-            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Reserve <strong>/22</strong> + <strong>/28</strong> for Private Service Access</li>
-            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>VPC peering to <code>servicenetworking</code></li>
-            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Cloud Router + Cloud NAT for controlled egress</li>
-            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Firewall rules &amp; private DNS zones</li>
+    <!-- ============ SLIDE 9 — Z2 NETWORKING (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Z2 · Networking" style="background:#FAF9FE;">
+      <div class="watermark">Z2</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#34A853;"><svg class="ico"><use href="#ic-network"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z2 · Networking &amp; VPC</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">Apigee runs in a Google-managed project reached from your VPC — addressing must be planned carefully.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-accent mb-3 flex items-center gap-2"><svg class="ico ico-sm text-accent"><use href="#ic-route"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Shared VPC host/service-project attachment</li>
+            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Reserve PSA range — <span class="mono">/22</span> runtime + <span class="mono">/28</span> troubleshoot</li>
+            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Peer to <span class="mono">servicenetworking.googleapis.com</span> <em>(or PSC, no-peering)</em></li>
+            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Cloud Router + Cloud NAT; Private Google Access</li>
+            <li class="flex gap-2"><span class="tick bg-accent/15 text-accent">✓</span>Firewall: LB health checks <span class="mono">130.211.0.0/22</span> <span class="mono">35.191.0.0/16</span></li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>A free, <strong>non-overlapping /22</strong> CIDR block</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Which VPC / host project Apigee peers into</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Existing IP plan / IPAM to avoid clashes</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Region(s) for the runtime instance(s)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Any centralized egress / NGFW requirement?</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>A free, <strong>non-overlapping /22 + /28</strong> CIDR</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Peering model: PSA peering vs PSC (no-peering)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Host project / VPC + existing IPAM plan</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Runtime region(s) &amp; HA topology</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Central egress / NGFW inspection requirement?</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> This is the #1 source of delays. The /22 must not overlap with on-prem or any peered VPC — once peered it's hard to change. Get their network team in the room to confirm the range today. Mention modern Apigee supports a non-peering / VPC-SC option; choose based on their security posture.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> The #1 source of delays. The /22 must not overlap on-prem or any peered VPC — once peered it's painful to change. Get their network team to confirm the range live. Modern Apigee supports a non-peering (PSC) model that avoids consuming a /22 in the VPC and plays nicer with VPC-SC — choose based on their security posture and IP scarcity.</aside>
     </section>
 
-    <!-- ============ SLIDE 9 — Z3 RUNTIME (WHITE) ============ -->
-    <section class="slide slide-white slide-pad" style="background:#FFFFFF;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#5B3FD6;">Z3</span><h2 class="font-heading font-bold text-[34px] text-ink">Apigee X Runtime</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">The Apigee organization, regional instances, environments and the keys that protect them.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-surface p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-primary mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Provision Apigee org (1:1 with project)</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>CMEK keys in Cloud KMS (per region, pre-created)</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Runtime instance(s) — single or multi-region HA</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Environments (dev/test/prod) &amp; env groups</li>
-            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Attach environments to instances</li>
+    <!-- ============ SLIDE 10 — Z3 RUNTIME (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Z3 · Runtime" style="background:#FFFFFF;">
+      <div class="watermark">Z3</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#5B3FD6;"><svg class="ico"><use href="#ic-runtime"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z3 · Apigee X Runtime</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">The organization, regional instances, environments and the customer-managed keys that protect them.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card-soft p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-primary mb-3 flex items-center gap-2"><svg class="ico ico-sm text-primary"><use href="#ic-key"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Provision org (1:1 project) with control-plane region</li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>CMEK keys: disk key (instance region) + control-plane key</li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Grant <span class="mono">cloudkms.cryptoKeyEncrypterDecrypter</span> to Apigee SA</li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Instance(s) per region; attach environments</li>
+            <li class="flex gap-2"><span class="tick bg-primary/15 text-primary">✓</span>Environments &amp; env groups → hostnames</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Analytics region &amp; data-residency constraints</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>HA/DR expectation — single vs multi-region</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Environment model (how many, naming, promotion)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>CMEK policy — own keys, rotation, key admins</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Expected peak TPS / latency targets (sizing)</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Control/analytics region &amp; data-residency limits</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>HA/DR — single vs multi-region active-active</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Environment model (count, naming, promotion)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>CMEK ownership, rotation period, Cloud HSM/EKM?</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Peak TPS / latency SLO (sizing basis)</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Keys must exist before provisioning and live in the matching region — a frequent blocker if CMEK is mandated. Multi-region doubles instance cost but gives active-active resilience. Environments and env groups are the unit of routing &amp; promotion — agree the model now because it shapes the LB and DNS later.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Keys must exist in the matching region and grant the Apigee service agent access <em>before</em> provisioning — a frequent blocker when CMEK is mandated. Multi-region roughly doubles instance cost but gives active-active resilience. The org's control region and subscription tier are locked at creation — confirm in discovery.</aside>
     </section>
 
-    <!-- ============ SLIDE 10 — Z4 NORTHBOUND (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#1A73E8;">Z4</span><h2 class="font-heading font-bold text-[34px] text-ink">Northbound Ingress</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">How consumers reach Apigee — privately bridged to a global, protected front door.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-white p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-secondary mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>PSC NEG → Apigee service attachment (private)</li>
-            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>Global External Application Load Balancer</li>
-            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>Cloud Armor — WAF rules &amp; DDoS protection</li>
-            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>Google-managed or uploaded TLS certificates</li>
-            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>DNS records → LB anycast IP</li>
+    <!-- ============ SLIDE 11 — Z4 NORTHBOUND (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Z4 · Northbound" style="background:#FAF9FE;">
+      <div class="watermark">Z4</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#1A73E8;"><svg class="ico"><use href="#ic-globe"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z4 · Northbound Ingress</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">How consumers reach Apigee — privately bridged to a global, protected front door.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-secondary mb-3 flex items-center gap-2"><svg class="ico ico-sm text-secondary"><use href="#ic-globe"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>PSC NEG <span class="mono">PRIVATE_SERVICE_CONNECT</span> → service attachment</li>
+            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>Global External ALB; backend service + Cloud Armor</li>
+            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>TLS via Certificate Manager; HTTP→HTTPS redirect</li>
+            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>Optional edge mTLS — server TLS policy / trust config</li>
+            <li class="flex gap-2"><span class="tick bg-secondary/15 text-secondary">✓</span>DNS A/AAAA → anycast VIP; hostnames match env group</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Public hostnames / domains for the APIs</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Who manages DNS? Access to create records</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Certificate strategy — managed vs corporate CA</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>WAF policy baseline &amp; allow/deny lists</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Public exposure vs internal-only ingress?</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Public hostnames / domains for the APIs</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Who manages DNS? Access to create records</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Certificate strategy — managed vs corporate CA</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>WAF baseline, allow/deny &amp; rate-based rules</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Public vs internal-only (regional internal ALB)?</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> The key insight: the Apigee runtime has no public IP — PSC privately connects it to the load balancer, which is the only thing exposed and is protected by Cloud Armor. Decide early whether ingress is internet-facing or internal (internal ALB) — it changes the LB type and DNS.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Key insight: the Apigee runtime has no public IP — a PSC NEG (in the same region as the instance) privately connects it to the load balancer, which is the only exposed surface and is fronted by Cloud Armor. Decide early internet-facing vs internal (regional internal ALB) — it changes the LB type and DNS. Edge mTLS is configured on the target HTTPS proxy via a trust config.</aside>
     </section>
 
-    <!-- ============ SLIDE 11 — Z5 SOUTHBOUND (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad" style="background:#FFFFFF;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#E8A400;">Z5</span><h2 class="font-heading font-bold text-[34px] text-ink">Southbound Connectivity</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">How Apigee reaches your real services — in-cloud, published, or on-premises.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-surface p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Routes from VPC to GKE / Cloud Run / Compute</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>PSC endpoints to published / SaaS services</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>On-prem reach via Interconnect / HA VPN</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Target servers, mTLS &amp; backend trust stores</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Egress firewall allow-listing</li>
+    <!-- ============ SLIDE 12 — Z5 SOUTHBOUND (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad" data-sec="Z5 · Southbound" style="background:#FFFFFF;">
+      <div class="watermark">Z5</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#E8A400;"><svg class="ico"><use href="#ic-server"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z5 · Southbound Connectivity</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">How Apigee reaches your real services — in-cloud, published, or on-premises.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card-soft p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3 flex items-center gap-2"><svg class="ico ico-sm text-amber"><use href="#ic-route"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Routes / PSC to GKE / Cloud Run / Compute</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>PSC endpoints to published / SaaS services</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>On-prem via Interconnect / HA VPN; Cloud Router BGP</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Target servers; backend mTLS via keystores/truststores</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Cloud NAT for internet egress; firewall allow-listing</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Inventory of target backends &amp; their hosts/ports</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>On-prem connectivity available today? (IC/VPN)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>mTLS / client-cert requirements per backend</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Backend auth model (OAuth, API key, IP allow-list)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Latency-sensitive routes needing region affinity</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Backend inventory — host / port / protocol / auth</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>On-prem connectivity today? (Interconnect/VPN, bandwidth)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>mTLS / client-cert requirements per backend</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Backend auth model (OAuth, mTLS, IP allow-list)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Latency-sensitive routes needing region affinity</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Ask for a backend inventory spreadsheet as homework — host, port, protocol, auth, network location. On-prem reachability is often the long pole (Interconnect provisioning can take weeks). Confirm whether their hybrid connectivity already exists or must be built.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Ask for a backend inventory spreadsheet as homework — host, port, protocol, auth, network location. On-prem reachability is often the long pole (Interconnect provisioning can take weeks). Backend mTLS is configured per target via keystores/truststores referenced in the TargetEndpoint SSLInfo.</aside>
     </section>
 
-    <!-- ============ SLIDE 12 — Z6 SECURITY (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#EA4335;">Z6</span><h2 class="font-heading font-bold text-[34px] text-ink">Security &amp; Governance</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">The guardrails that keep the platform compliant — and that can silently block provisioning.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-white p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-coral mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>CMEK via Cloud KMS for runtime &amp; data at rest</li>
-            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>VPC Service Controls perimeter (if required)</li>
-            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>Secret Manager for credentials &amp; keys</li>
-            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>Policy: OAuth, API keys, JWT, threat protection</li>
-            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>Audit logging &amp; least-privilege IAM</li>
+    <!-- ============ SLIDE 13 — Z6 SECURITY (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Z6 · Security" style="background:#FAF9FE;">
+      <div class="watermark">Z6</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#EA4335;"><svg class="ico"><use href="#ic-shield"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z6 · Security &amp; Governance</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">The guardrails that keep the platform compliant — and that can silently block provisioning.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-coral mb-3 flex items-center gap-2"><svg class="ico ico-sm text-coral"><use href="#ic-shield"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>CMEK across runtime &amp; data at rest; Secret Manager</li>
+            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>VPC-SC perimeter; restrict <span class="mono">apigee.googleapis.com</span></li>
+            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>Ingress/egress rules &amp; access levels for the perimeter</li>
+            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>Proxy policies: OAuth2 / JWT / API key, SpikeArrest, threat</li>
+            <li class="flex gap-2"><span class="tick bg-coral/15 text-coral">✓</span>Audit logging &amp; least-privilege custom roles</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Org policies in force (ext IP, CMEK, DRS, SA keys)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Is a VPC-SC perimeter mandated? Which projects?</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Compliance scope — PCI, HIPAA, data residency</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Key management ownership &amp; rotation policy</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Security approver &amp; exception process</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2 text-[13.5px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Active org policies — <span class="mono">vmExternalIpAccess</span> <span class="mono">resourceLocations</span></li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span><span class="mono">disableServiceAccountKeyCreation</span> · <span class="mono">restrictVpcPeering</span> · DRS</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>VPC-SC mandated? Which projects in the perimeter?</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Compliance scope — PCI / HIPAA / data residency</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Key mgmt ownership, rotation, Cloud HSM / EKM</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> This zone causes the most surprises. Org policies like “restrict external IPs”, “require CMEK”, domain-restricted sharing, or a tight VPC-SC perimeter will block provisioning unless exceptions/ingress rules are prepared. Get the security owner engaged now, not at go-live.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> This zone causes the most surprises. Org policies like restrict-external-IP, require-CMEK, resource-location, disable-SA-keys, restrict-VPC-peering, and domain-restricted sharing will fail provisioning unless exceptions are pre-staged. A strict VPC-SC perimeter needs the Apigee + service-networking APIs added as restricted services with the right ingress/egress rules and access levels. Engage the security owner now, not at go-live.</aside>
     </section>
 
-    <!-- ============ SLIDE 13 — Z7 OBSERVABILITY (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad" style="background:#FFFFFF;">
-      <div class="flex items-center gap-4 mb-1"><span class="zbadge w-12 h-12 rounded-xl text-white text-lg" style="background:#E8A400;">Z7</span><h2 class="font-heading font-bold text-[34px] text-ink">Observability &amp; Operations</h2></div>
-      <p class="text-ink/55 text-[15px] mb-5 ml-16">Knowing what's happening — and being alerted before customers feel it.</p>
-      <div class="grid grid-cols-2 gap-6">
-        <div class="card rounded-2xl bg-surface p-6">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we configure</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Apigee API analytics &amp; custom reports</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Cloud Monitoring dashboards &amp; SLOs</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Cloud Logging + log routing / export</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Alerting on latency, errors, quota, cert expiry</li>
-            <li class="flex gap-2"><span class="tick bg-amber/20 text-[#8a6200]">✓</span>Debug/trace sessions for proxy troubleshooting</li>
+    <!-- ============ SLIDE 14 — Z7 OBSERVABILITY (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad" data-sec="Z7 · Observability" style="background:#FFFFFF;">
+      <div class="watermark">Z7</div>
+      <div class="flex items-center gap-4 mb-1 relative z-10"><span class="zicon w-12 h-12 text-white" style="background:#E8A400;"><svg class="ico"><use href="#ic-eye"/></svg></span><h2 class="font-heading font-bold text-[34px] text-ink">Z7 · Observability &amp; Operations</h2></div>
+      <p class="text-ink/55 text-[15px] mb-5 ml-16 relative z-10">Knowing what's happening — and being alerted before customers feel it.</p>
+      <div class="grid grid-cols-2 gap-6 relative z-10">
+        <div class="card-soft p-6">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3 flex items-center gap-2"><svg class="ico ico-sm text-amber"><use href="#ic-gauge"/></svg>What we configure</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Apigee API analytics &amp; custom reports</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Cloud Monitoring dashboards &amp; SLOs — <span class="mono">apigee.googleapis.com/*</span></li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Cloud Logging + log sinks → BigQuery / Pub/Sub / SIEM</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Alerting on p99 latency, 5xx rate, quota, cert expiry</li>
+            <li class="flex gap-2"><span class="tick bg-amber/20 text-amber">✓</span>Cloud Trace &amp; debug/trace sessions for proxies</li>
           </ul>
         </div>
-        <div class="card rounded-2xl p-6" style="background:linear-gradient(160deg,#FFF8E6,#fff);">
-          <h3 class="font-heading font-semibold text-[16px] text-[#a17a14] mb-3">What we need from you</h3>
-          <ul class="space-y-2 text-[14.5px] text-ink/80">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>SIEM / observability stack to integrate (Splunk?)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Alert channels &amp; on-call (PagerDuty, email, chat)</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>SLOs / SLAs the platform must meet</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Log retention &amp; export requirements</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Who operates the platform post go-live?</li>
+        <div class="card p-6" style="border-left:4px solid #E8A400; background:linear-gradient(160deg,#FFF8E6,#fff);">
+          <h3 class="font-heading font-semibold text-[15px] text-amber mb-3">What we need from you</h3>
+          <ul class="space-y-2.5 text-[14px] text-ink/80">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>SIEM / observability target (Splunk, Chronicle…)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Alert channels &amp; on-call (PagerDuty, email, chat)</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>SLOs / SLAs the platform must meet</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Log retention, export &amp; residency requirements</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Day-2 operating model &amp; named owner</li>
           </ul>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Define “good” before launch — what SLOs, who gets paged, where logs land. Most enterprises want Apigee logs/metrics fanned into their existing SIEM; confirm the export path and retention. Day-2 ownership (their platform team vs managed service) should be named here.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Define “good” before launch — what SLOs, who gets paged, where logs land. Most enterprises fan Apigee logs/metrics into an existing SIEM via a log sink to Pub/Sub or BigQuery; confirm export path, retention and residency. Name the day-2 owner (their platform team vs managed service) here.</aside>
     </section>
 
-    <!-- ============ SLIDE 14 — GUARDRAILS / PITFALLS (WHITE) ============ -->
-    <section class="slide slide-white slide-pad" style="background:#FFFFFF;">
-      <p class="eyebrow text-[12px] text-coral mb-2">Expert insight</p>
-      <h2 class="font-heading font-bold text-[36px] text-ink mb-2">Guardrails that commonly block provisioning</h2>
-      <p class="text-ink/55 text-[15px] mb-6 max-w-4xl">From the field — surface these <em>before</em> we start, or they become day-one blockers.</p>
+    <!-- ============ SLIDE 15 — PROVISIONING SEQUENCE (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Architecture" style="background:#FFFFFF;">
+      <p class="kicker text-primary mb-1">Build order</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-1">The provisioning sequence</h2>
+      <p class="text-ink/55 text-[14.5px] mb-5 max-w-4xl">Order matters — keys before instances, peering before runtime, runtime before ingress. Delivered as code (<span class="mono">apigeecli</span> · <span class="mono">gcloud</span> · Terraform Apigee modules).</p>
+      <div class="grid grid-cols-3 gap-x-6 gap-y-4">
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#5B3FD6;">1</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Enable APIs &amp; grant roles</p><p class="text-[12.5px] text-ink/60">services + provisioning identity &amp; service agents</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#34A853;">2</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Reserve range &amp; peer</p><p class="text-[12.5px] text-ink/60"><span class="mono">/22</span>+<span class="mono">/28</span> PSA — or choose PSC no-peering</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#EA4335;">3</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Create CMEK keys</p><p class="text-[12.5px] text-ink/60">per region; grant Apigee service agent</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#5B3FD6;">4</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Provision organization</p><p class="text-[12.5px] text-ink/60">control region + subscription</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#5B3FD6;">5</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Create instance(s) &amp; attach</p><p class="text-[12.5px] text-ink/60">regional runtime + environments</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#1A73E8;">6</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Env groups &amp; hostnames</p><p class="text-[12.5px] text-ink/60">routing model</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#1A73E8;">7</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Northbound ingress</p><p class="text-[12.5px] text-ink/60">PSC NEG → ALB + Armor + cert + DNS</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#E8A400;">8</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Southbound &amp; targets</p><p class="text-[12.5px] text-ink/60">routes / Interconnect + target servers</p></div></div>
+        <div class="flex gap-3"><span class="zbadge w-8 h-8 rounded-lg text-white text-[13px] flex-none" style="background:#E8A400;">9</span><div><p class="font-heading font-semibold text-[14.5px] text-ink">Deploy &amp; validate</p><p class="text-[12.5px] text-ink/60">first proxy, E2E test, wire monitoring</p></div></div>
+      </div>
+      <div class="card-soft p-3 mt-5 flex items-center gap-3"><svg class="ico ico-sm text-primary flex-none"><use href="#ic-bolt"/></svg><p class="text-[13px] text-ink/70">Steps <strong>1–3</strong> carry the external dependencies (CIDR, org-policy exceptions, key ownership). Start them in week 1 — everything after is largely automatable.</p></div>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Emphasize the ordering constraints: CMEK keys before instances; peering (or PSC) before runtime; runtime service attachment before the PSC NEG/LB. We deliver this as Terraform/CLI so it's repeatable across environments. The gating items are inputs 1–3, which are the client's to supply.</aside>
+    </section>
+
+    <!-- ============ SLIDE 16 — GUARDRAILS / PITFALLS (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Mobilize" style="background:#FFFFFF;">
+      <p class="kicker text-coral mb-2">Expert insight</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-2">Guardrails that commonly block provisioning</h2>
+      <p class="text-ink/55 text-[14.5px] mb-6 max-w-4xl">From the field — surface these <em>before</em> we start, or they become day-one blockers.</p>
       <div class="grid grid-cols-3 gap-5">
-        <div class="card rounded-xl bg-surface p-5"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">Org policy clashes</h3><p class="text-[13.5px] text-ink/70">Restrict-external-IP, require-CMEK, domain-restricted sharing, and disable-SA-key constraints silently fail provisioning until exceptions are granted.</p></div>
-        <div class="card rounded-xl bg-surface p-5"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">Overlapping CIDR</h3><p class="text-[13.5px] text-ink/70">A /22 that overlaps on-prem or a peered VPC can't be changed after peering — forces a costly re-provision. Validate against IPAM first.</p></div>
-        <div class="card rounded-xl bg-surface p-5"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">VPC-SC perimeter</h3><p class="text-[13.5px] text-ink/70">A strict perimeter blocks Apigee &amp; service-networking APIs without ingress/egress rules and the right access levels.</p></div>
-        <div class="card rounded-xl bg-surface p-5"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">CMEK timing</h3><p class="text-[13.5px] text-ink/70">Keys must exist in the correct region and grant the Apigee service agent access <em>before</em> provisioning — not after.</p></div>
-        <div class="card rounded-xl bg-surface p-5"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">Missing IAM grants</h3><p class="text-[13.5px] text-ink/70">Service-agent role bindings (compute, servicenetworking, KMS) are easy to miss and produce opaque permission errors.</p></div>
-        <div class="card rounded-xl bg-surface p-5"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">On-prem long pole</h3><p class="text-[13.5px] text-ink/70">Interconnect/VPN to reach backends can take weeks of lead time — start it in parallel, not at the end.</p></div>
+        <div class="card p-5" style="border-top:3px solid #EA4335;"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">Org policy clashes</h3><p class="text-[13px] text-ink/70"><span class="mono">restrict-external-IP</span>, require-CMEK, DRS and <span class="mono">disable-SA-key</span> constraints silently fail provisioning until exceptions are granted.</p></div>
+        <div class="card p-5" style="border-top:3px solid #EA4335;"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">Overlapping CIDR</h3><p class="text-[13px] text-ink/70">A /22 overlapping on-prem or a peered VPC can't be changed after peering — forces a costly re-provision. Validate against IPAM first.</p></div>
+        <div class="card p-5" style="border-top:3px solid #EA4335;"><h3 class="font-heading font-semibold text-[15px] text-coral mb-2">VPC-SC perimeter</h3><p class="text-[13px] text-ink/70">A strict perimeter blocks <span class="mono">apigee</span> &amp; <span class="mono">servicenetworking</span> APIs without ingress/egress rules and access levels.</p></div>
+        <div class="card p-5" style="border-top:3px solid #E8A400;"><h3 class="font-heading font-semibold text-[15px] text-amber mb-2">CMEK timing</h3><p class="text-[13px] text-ink/70">Keys must exist in the correct region and grant the Apigee service agent access <em>before</em> provisioning — not after.</p></div>
+        <div class="card p-5" style="border-top:3px solid #E8A400;"><h3 class="font-heading font-semibold text-[15px] text-amber mb-2">Missing IAM grants</h3><p class="text-[13px] text-ink/70">Service-agent bindings (<span class="mono">compute</span>, <span class="mono">servicenetworking</span>, <span class="mono">kms</span>) are easy to miss and produce opaque permission errors.</p></div>
+        <div class="card p-5" style="border-top:3px solid #E8A400;"><h3 class="font-heading font-semibold text-[15px] text-amber mb-2">On-prem long pole</h3><p class="text-[13px] text-ink/70">Interconnect/VPN to reach backends can take weeks of lead time — start it in parallel, not at the end.</p></div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> This is your credibility slide — it shows you've done this before. Walk each card briefly and ask “does any of this apply to you?” Capture owners against each. The two that derail timelines most: overlapping CIDR and org-policy/VPC-SC exceptions.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Your credibility slide — it shows you've done this before. Walk each card and ask “does this apply to you?”, capturing an owner per item. The two that derail timelines most: overlapping CIDR and org-policy / VPC-SC exceptions.</aside>
     </section>
 
-    <!-- ============ SLIDE 15 — SIZING & COST (WHITE) ============ -->
-    <section class="slide slide-white slide-pad" style="background:#FFFFFF;">
-      <p class="eyebrow text-[12px] text-primary mb-2">Sizing &amp; cost</p>
-      <h2 class="font-heading font-bold text-[36px] text-ink mb-6">What drives sizing, regions &amp; cost</h2>
+    <!-- ============ SLIDE 17 — SIZING & COST (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Mobilize" style="background:#FFFFFF;">
+      <p class="kicker text-primary mb-2">Sizing &amp; cost</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-6">What drives sizing, regions &amp; cost</h2>
       <div class="grid grid-cols-2 gap-7">
         <div>
           <h3 class="font-heading font-semibold text-[17px] text-ink mb-3">Primary cost drivers</h3>
           <div class="space-y-3">
-            <div class="card rounded-xl bg-surface p-4 flex items-center gap-4"><span class="font-heading font-bold text-primary text-[15px] w-28">Subscription</span><span class="text-[14px] text-ink/70">Std / Enterprise / Enterprise Plus tier, or pay-as-you-go API call volume.</span></div>
-            <div class="card rounded-xl bg-surface p-4 flex items-center gap-4"><span class="font-heading font-bold text-secondary text-[15px] w-28">Instances</span><span class="text-[14px] text-ink/70">Each region = one runtime instance. Multi-region for HA/DR multiplies cost.</span></div>
-            <div class="card rounded-xl bg-surface p-4 flex items-center gap-4"><span class="font-heading font-bold text-accent text-[15px] w-28">Environments</span><span class="text-[14px] text-ink/70">Number of environments &amp; entitlements vary by tier.</span></div>
-            <div class="card rounded-xl bg-surface p-4 flex items-center gap-4"><span class="font-heading font-bold text-amber text-[15px] w-28">Surround</span><span class="text-[14px] text-ink/70">Load balancer, Cloud Armor, NAT egress, KMS, logging/monitoring.</span></div>
+            <div class="card p-4 flex items-center gap-4"><span class="font-heading font-bold text-primary text-[14px] w-28 flex-none">Subscription</span><span class="text-[13.5px] text-ink/70">Std / Enterprise / Enterprise Plus tier, or pay-as-you-go by API call.</span></div>
+            <div class="card p-4 flex items-center gap-4"><span class="font-heading font-bold text-secondary text-[14px] w-28 flex-none">Instances</span><span class="text-[13.5px] text-ink/70">Each region = one runtime instance. Multi-region for HA/DR multiplies cost.</span></div>
+            <div class="card p-4 flex items-center gap-4"><span class="font-heading font-bold text-accent text-[14px] w-28 flex-none">Environments</span><span class="text-[13.5px] text-ink/70">Environment count &amp; entitlements vary by tier.</span></div>
+            <div class="card p-4 flex items-center gap-4"><span class="font-heading font-bold text-amber text-[14px] w-28 flex-none">Surround</span><span class="text-[13.5px] text-ink/70">Load balancer, Cloud Armor, NAT egress, KMS, logging/monitoring.</span></div>
           </div>
         </div>
         <div>
           <h3 class="font-heading font-semibold text-[17px] text-ink mb-3">Sizing questions for you</h3>
-          <ul class="space-y-2.5 text-[14.5px] text-ink/75">
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Expected API call volume — steady &amp; peak TPS</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Latency / availability SLA targets</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>One region or multi-region (active-active)?</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>How many environments &amp; teams onboarding?</li>
-            <li class="flex gap-2"><span class="tick bg-amber/25 text-[#8a6200]">?</span>Growth horizon — 6, 12, 24 months</li>
+          <ul class="space-y-2.5 text-[14px] text-ink/75">
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>API call volume — steady &amp; peak TPS</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Latency / availability SLA targets</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>One region or multi-region (active-active)?</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>How many environments &amp; teams onboarding?</li>
+            <li class="flex gap-2"><span class="tick bg-amber/25 text-amber">?</span>Growth horizon — 6, 12, 24 months</li>
           </ul>
-          <div class="card rounded-xl p-4 mt-4" style="background:linear-gradient(160deg,#efeaff,#fff);">
-            <p class="text-[13.5px] text-ink/75"><strong class="text-primary">Rule of thumb:</strong> start single-region for a pilot, design the network &amp; env model for multi-region so scaling later is config, not a rebuild.</p>
+          <div class="card p-4 mt-4" style="border-left:4px solid #5B3FD6; background:linear-gradient(160deg,#efeaff,#fff);">
+            <p class="text-[13px] text-ink/75"><strong class="text-primary">Rule of thumb:</strong> start single-region for a pilot, but design the network &amp; environment model for multi-region so scaling later is config — not a rebuild.</p>
           </div>
         </div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Don't quote firm prices live — gather the inputs and follow up with a costed proposal. The cheapest mistake to avoid: under-planning the network so a later multi-region expansion forces a re-provision. Capture their volume &amp; SLA numbers as the sizing basis.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Don't quote firm prices live — gather inputs, follow up with a costed proposal. The cheapest mistake to avoid: under-planning the network so a later multi-region expansion forces a re-provision. Capture their volume &amp; SLA numbers as the sizing basis.</aside>
     </section>
 
-    <!-- ============ SLIDE 16 — RACI (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <p class="eyebrow text-[12px] text-primary mb-2">Roles &amp; responsibilities</p>
-      <h2 class="font-heading font-bold text-[36px] text-ink mb-6">Who does what (RACI)</h2>
-      <div class="card rounded-2xl bg-white overflow-hidden">
+    <!-- ============ SLIDE 18 — RACI (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Mobilize" style="background:#FAF9FE;">
+      <p class="kicker text-primary mb-2">Roles &amp; responsibilities</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-5">Who does what (RACI)</h2>
+      <div class="card overflow-hidden p-0">
         <table class="w-full text-[14px]">
           <thead>
             <tr class="bg-primary text-white font-heading text-[13.5px]">
@@ -663,143 +780,102 @@
             </tr>
           </thead>
           <tbody class="text-ink/80">
-            <tr class="border-b border-primary/10"><td class="px-5 py-2.5 font-semibold text-ink">Foundation &amp; IAM (Z1)</td><td class="text-center">A</td><td class="text-center text-primary font-bold">R</td><td class="text-center">C</td></tr>
-            <tr class="border-b border-primary/10 bg-surface/50"><td class="px-5 py-2.5 font-semibold text-ink">Networking &amp; CIDR (Z2)</td><td class="text-center text-primary font-bold">R/A</td><td class="text-center">C</td><td class="text-center">I</td></tr>
-            <tr class="border-b border-primary/10"><td class="px-5 py-2.5 font-semibold text-ink">Apigee runtime (Z3)</td><td class="text-center">C</td><td class="text-center text-primary font-bold">R</td><td class="text-center">R</td></tr>
-            <tr class="border-b border-primary/10 bg-surface/50"><td class="px-5 py-2.5 font-semibold text-ink">Ingress: LB/PSC/DNS (Z4)</td><td class="text-center">C</td><td class="text-center text-primary font-bold">R</td><td class="text-center">I</td></tr>
-            <tr class="border-b border-primary/10"><td class="px-5 py-2.5 font-semibold text-ink">Backends &amp; on-prem (Z5)</td><td class="text-center text-primary font-bold">R</td><td class="text-center">C</td><td class="text-center">I</td></tr>
-            <tr class="border-b border-primary/10 bg-surface/50"><td class="px-5 py-2.5 font-semibold text-ink">Security &amp; policy (Z6)</td><td class="text-center text-primary font-bold">A</td><td class="text-center text-primary font-bold">R</td><td class="text-center">C</td></tr>
-            <tr><td class="px-5 py-2.5 font-semibold text-ink">Observability (Z7)</td><td class="text-center">C</td><td class="text-center text-primary font-bold">R</td><td class="text-center">I</td></tr>
+            <tr class="border-b border-primary/10"><td class="px-5 py-2 font-semibold text-ink">Foundation &amp; IAM (Z1)</td><td class="text-center">A</td><td class="text-center text-primary font-bold">R</td><td class="text-center">C</td></tr>
+            <tr class="border-b border-primary/10 bg-surface/60"><td class="px-5 py-2 font-semibold text-ink">Networking &amp; CIDR (Z2)</td><td class="text-center text-primary font-bold">R/A</td><td class="text-center">C</td><td class="text-center">I</td></tr>
+            <tr class="border-b border-primary/10"><td class="px-5 py-2 font-semibold text-ink">Apigee runtime (Z3)</td><td class="text-center">C</td><td class="text-center text-primary font-bold">R</td><td class="text-center">R</td></tr>
+            <tr class="border-b border-primary/10 bg-surface/60"><td class="px-5 py-2 font-semibold text-ink">Ingress: LB/PSC/DNS (Z4)</td><td class="text-center">C</td><td class="text-center text-primary font-bold">R</td><td class="text-center">I</td></tr>
+            <tr class="border-b border-primary/10"><td class="px-5 py-2 font-semibold text-ink">Backends &amp; on-prem (Z5)</td><td class="text-center text-primary font-bold">R</td><td class="text-center">C</td><td class="text-center">I</td></tr>
+            <tr class="border-b border-primary/10 bg-surface/60"><td class="px-5 py-2 font-semibold text-ink">Security &amp; policy (Z6)</td><td class="text-center text-primary font-bold">A</td><td class="text-center text-primary font-bold">R</td><td class="text-center">C</td></tr>
+            <tr><td class="px-5 py-2 font-semibold text-ink">Observability (Z7)</td><td class="text-center">C</td><td class="text-center text-primary font-bold">R</td><td class="text-center">I</td></tr>
           </tbody>
         </table>
       </div>
       <p class="text-[12.5px] text-ink/50 mt-3">R = Responsible · A = Accountable · C = Consulted · I = Informed</p>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> The two rows the client owns most are networking (the CIDR is theirs to allocate) and backends/on-prem. Confirm named people for each accountable cell — a blank owner is a future blocker. Adjust this RACI to their operating model.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> The two rows the client owns most are networking (CIDR allocation) and backends/on-prem. Confirm a named person for every accountable cell — a blank owner is a future blocker. Adjust to their operating model.</aside>
     </section>
 
-    <!-- ============ SLIDE 17 — TIMELINE (WHITE) ============ -->
-    <section class="slide slide-white slide-pad" style="background:#FFFFFF;">
-      <p class="eyebrow text-[12px] text-primary mb-2">Delivery plan</p>
-      <h2 class="font-heading font-bold text-[36px] text-ink mb-7">Indicative timeline &amp; milestones</h2>
+    <!-- ============ SLIDE 19 — TIMELINE (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="Mobilize" style="background:#FFFFFF;">
+      <p class="kicker text-primary mb-2">Delivery plan</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-6">Indicative timeline &amp; milestones</h2>
       <div class="grid grid-cols-4 gap-4">
-        <div class="card rounded-2xl bg-surface p-5 border-t-4" style="border-top-color:#5B3FD6;">
-          <p class="font-heading font-bold text-primary text-[13px] mb-1">PHASE 1 · Wk 1–2</p>
-          <h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Discovery</h3>
-          <ul class="text-[13px] text-ink/70 space-y-1.5"><li>• Collect inputs (Z1–Z7)</li><li>• Confirm CIDR &amp; policies</li><li>• Sizing &amp; cost proposal</li><li>• Design sign-off</li></ul>
-        </div>
-        <div class="card rounded-2xl bg-surface p-5 border-t-4" style="border-top-color:#1A73E8;">
-          <p class="font-heading font-bold text-secondary text-[13px] mb-1">PHASE 2 · Wk 3–4</p>
-          <h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Foundation</h3>
-          <ul class="text-[13px] text-ink/70 space-y-1.5"><li>• Project, IAM, APIs</li><li>• VPC, PSA peering, NAT</li><li>• KMS / CMEK keys</li><li>• Policy exceptions</li></ul>
-        </div>
-        <div class="card rounded-2xl bg-surface p-5 border-t-4" style="border-top-color:#34A853;">
-          <p class="font-heading font-bold text-accent text-[13px] mb-1">PHASE 3 · Wk 5–6</p>
-          <h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Provision</h3>
-          <ul class="text-[13px] text-ink/70 space-y-1.5"><li>• Apigee org &amp; instance</li><li>• Env groups &amp; envs</li><li>• LB, PSC, Armor, DNS</li><li>• First proxy live</li></ul>
-        </div>
-        <div class="card rounded-2xl bg-surface p-5 border-t-4" style="border-top-color:#E8A400;">
-          <p class="font-heading font-bold text-amber text-[13px] mb-1">PHASE 4 · Wk 7–8</p>
-          <h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Operationalize</h3>
-          <ul class="text-[13px] text-ink/70 space-y-1.5"><li>• Backends &amp; on-prem</li><li>• Monitoring &amp; alerting</li><li>• CI/CD &amp; handover</li><li>• Go-live &amp; pilot</li></ul>
-        </div>
+        <div class="card accent-top p-5" style="--ac:#5B3FD6;"><p class="font-heading font-bold text-primary text-[13px] mb-1">PHASE 1 · Wk 1–2</p><h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Discovery</h3><ul class="text-[12.5px] text-ink/70 space-y-1.5"><li>• Collect inputs (Z1–Z7)</li><li>• Confirm CIDR &amp; policies</li><li>• Sizing &amp; cost proposal</li><li>• Design sign-off</li></ul></div>
+        <div class="card accent-top p-5" style="--ac:#1A73E8;"><p class="font-heading font-bold text-secondary text-[13px] mb-1">PHASE 2 · Wk 3–4</p><h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Foundation</h3><ul class="text-[12.5px] text-ink/70 space-y-1.5"><li>• Project, IAM, APIs</li><li>• VPC, PSA peering, NAT</li><li>• KMS / CMEK keys</li><li>• Policy exceptions</li></ul></div>
+        <div class="card accent-top p-5" style="--ac:#34A853;"><p class="font-heading font-bold text-accent text-[13px] mb-1">PHASE 3 · Wk 5–6</p><h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Provision</h3><ul class="text-[12.5px] text-ink/70 space-y-1.5"><li>• Apigee org &amp; instance</li><li>• Env groups &amp; envs</li><li>• LB, PSC, Armor, DNS</li><li>• First proxy live</li></ul></div>
+        <div class="card accent-top p-5" style="--ac:#E8A400;"><p class="font-heading font-bold text-amber text-[13px] mb-1">PHASE 4 · Wk 7–8</p><h3 class="font-heading font-semibold text-[16px] text-ink mb-2">Operationalize</h3><ul class="text-[12.5px] text-ink/70 space-y-1.5"><li>• Backends &amp; on-prem</li><li>• Monitoring &amp; alerting</li><li>• CI/CD &amp; handover</li><li>• Go-live &amp; pilot</li></ul></div>
       </div>
-      <div class="card rounded-xl p-4 mt-6" style="background:linear-gradient(160deg,#efeaff,#fff);">
-        <p class="text-[13.5px] text-ink/75"><strong class="text-primary">Indicative 6–8 weeks</strong> to a production-ready pilot. Critical path is usually CIDR sign-off, policy exceptions, and on-prem connectivity — start all three in week 1.</p>
+      <div class="card p-4 mt-6" style="border-left:4px solid #5B3FD6; background:linear-gradient(160deg,#efeaff,#fff);">
+        <p class="text-[13.5px] text-ink/75"><strong class="text-primary">Indicative 6–8 weeks</strong> to a production-ready pilot. Critical path is CIDR sign-off, policy exceptions, and on-prem connectivity — start all three in week 1.</p>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Timeline is indicative and depends on how fast inputs and approvals come back — make that dependency explicit. Phases 2 and 4 carry the external lead times (policy exceptions, Interconnect). Offer to run discovery as a focused workshop.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Timeline is indicative and gated by how fast inputs and approvals come back — make that dependency explicit. Phases 2 and 4 carry the external lead times. Offer to run discovery as a focused workshop.</aside>
     </section>
 
-    <!-- ============ SLIDE 18 — WHAT WE NEED FROM YOU (WHITE) ============ -->
-    <section class="slide slide-white slide-pad" style="background:#FFFFFF;">
-      <p class="eyebrow text-[12px] text-coral mb-2">The takeaway</p>
-      <h2 class="font-heading font-bold text-[36px] text-ink mb-1">What we need from you — pre-requisites</h2>
-      <p class="text-ink/55 text-[15px] mb-5 max-w-4xl">The consolidated input list. Send these back and we can begin Phase 2 immediately.</p>
+    <!-- ============ SLIDE 20 — WHAT WE NEED FROM YOU (WHITE) ============ -->
+    <section class="slide slide-white slide-pad" data-sec="The ask" style="background:#FFFFFF;">
+      <p class="kicker text-coral mb-2">The takeaway</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-1">What we need from you — pre-requisites</h2>
+      <p class="text-ink/55 text-[14.5px] mb-5 max-w-4xl">The consolidated input list. Return these and we can begin Phase 2 immediately.</p>
       <div class="grid grid-cols-3 gap-4">
-        <div class="card rounded-xl bg-surface p-4">
-          <h3 class="font-heading font-semibold text-[14px] text-primary mb-2">Foundation &amp; access</h3>
-          <ul class="text-[13px] text-ink/75 space-y-1.5"><li>☐ Billing account &amp; budget owner</li><li>☐ Project / folder placement &amp; naming</li><li>☐ IAM approval flow &amp; approvers</li><li>☐ Subscription tier decision</li></ul>
-        </div>
-        <div class="card rounded-xl bg-surface p-4">
-          <h3 class="font-heading font-semibold text-[14px] text-accent mb-2">Networking</h3>
-          <ul class="text-[13px] text-ink/75 space-y-1.5"><li>☐ Non-overlapping <strong>/22</strong> + <strong>/28</strong></li><li>☐ Host VPC / Shared VPC target</li><li>☐ Runtime region(s) &amp; HA choice</li><li>☐ Egress / NGFW requirements</li></ul>
-        </div>
-        <div class="card rounded-xl bg-surface p-4">
-          <h3 class="font-heading font-semibold text-[14px] text-secondary mb-2">Ingress &amp; DNS</h3>
-          <ul class="text-[13px] text-ink/75 space-y-1.5"><li>☐ Public hostnames / domains</li><li>☐ DNS management access</li><li>☐ Certificate strategy</li><li>☐ Public vs internal exposure</li></ul>
-        </div>
-        <div class="card rounded-xl bg-surface p-4">
-          <h3 class="font-heading font-semibold text-[14px] text-[#a17a14] mb-2">Backends</h3>
-          <ul class="text-[13px] text-ink/75 space-y-1.5"><li>☐ Backend inventory (host/port/auth)</li><li>☐ On-prem connectivity status</li><li>☐ mTLS / client-cert needs</li><li>☐ Latency-sensitive routes</li></ul>
-        </div>
-        <div class="card rounded-xl bg-surface p-4">
-          <h3 class="font-heading font-semibold text-[14px] text-coral mb-2">Security &amp; governance</h3>
-          <ul class="text-[13px] text-ink/75 space-y-1.5"><li>☐ Active org policies list</li><li>☐ VPC-SC perimeter requirement</li><li>☐ CMEK ownership &amp; rotation</li><li>☐ Compliance scope &amp; approver</li></ul>
-        </div>
-        <div class="card rounded-xl bg-surface p-4">
-          <h3 class="font-heading font-semibold text-[14px] text-amber mb-2">Operations &amp; sizing</h3>
-          <ul class="text-[13px] text-ink/75 space-y-1.5"><li>☐ Peak/steady TPS &amp; SLA targets</li><li>☐ SIEM / alert channels</li><li>☐ Log retention &amp; export</li><li>☐ Day-2 owner</li></ul>
-        </div>
+        <div class="card accent-top p-4" style="--ac:#5B3FD6;"><h3 class="font-heading font-semibold text-[14px] text-primary mb-2">Foundation &amp; access</h3><ul class="text-[12.5px] text-ink/75 space-y-1.5"><li>☐ Billing account &amp; budget owner</li><li>☐ Project / folder placement &amp; naming</li><li>☐ IAM approval flow &amp; approvers</li><li>☐ Subscription tier decision</li></ul></div>
+        <div class="card accent-top p-4" style="--ac:#34A853;"><h3 class="font-heading font-semibold text-[14px] text-accent mb-2">Networking</h3><ul class="text-[12.5px] text-ink/75 space-y-1.5"><li>☐ Non-overlapping <span class="mono">/22</span>+<span class="mono">/28</span></li><li>☐ Peering vs PSC model</li><li>☐ Host VPC + runtime region(s)</li><li>☐ Egress / NGFW requirements</li></ul></div>
+        <div class="card accent-top p-4" style="--ac:#1A73E8;"><h3 class="font-heading font-semibold text-[14px] text-secondary mb-2">Ingress &amp; DNS</h3><ul class="text-[12.5px] text-ink/75 space-y-1.5"><li>☐ Public hostnames / domains</li><li>☐ DNS management access</li><li>☐ Certificate strategy</li><li>☐ Public vs internal exposure</li></ul></div>
+        <div class="card accent-top p-4" style="--ac:#E8A400;"><h3 class="font-heading font-semibold text-[14px] text-amber mb-2">Backends</h3><ul class="text-[12.5px] text-ink/75 space-y-1.5"><li>☐ Backend inventory (host/port/auth)</li><li>☐ On-prem connectivity status</li><li>☐ mTLS / client-cert needs</li><li>☐ Latency-sensitive routes</li></ul></div>
+        <div class="card accent-top p-4" style="--ac:#EA4335;"><h3 class="font-heading font-semibold text-[14px] text-coral mb-2">Security &amp; governance</h3><ul class="text-[12.5px] text-ink/75 space-y-1.5"><li>☐ Active org policies list</li><li>☐ VPC-SC perimeter requirement</li><li>☐ CMEK ownership &amp; rotation</li><li>☐ Compliance scope &amp; approver</li></ul></div>
+        <div class="card accent-top p-4" style="--ac:#5B3FD6;"><h3 class="font-heading font-semibold text-[14px] text-primary mb-2">Operations &amp; sizing</h3><ul class="text-[12.5px] text-ink/75 space-y-1.5"><li>☐ Peak/steady TPS &amp; SLA targets</li><li>☐ SIEM / alert channels</li><li>☐ Log retention &amp; export</li><li>☐ Day-2 owner</li></ul></div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> This is the slide they keep. Offer to send it as a fillable checklist / shared sheet right after the call. Encourage them to nominate a single point of contact to coordinate the responses. Flag the three critical-path items: the /22, org policies, on-prem connectivity.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> The slide they keep. Offer to send it as a fillable sheet right after the call and ask them to nominate a single point of contact. The three critical-path items: the /22, org policies, and on-prem connectivity.</aside>
     </section>
 
-    <!-- ============ SLIDE 19 — RISKS & MITIGATIONS (LIGHT) ============ -->
-    <section class="slide slide-light slide-pad bg-dots" style="background:#FAF9FE;">
-      <p class="eyebrow text-[12px] text-primary mb-2">De-risking</p>
-      <h2 class="font-heading font-bold text-[36px] text-ink mb-6">Risks &amp; how we mitigate them</h2>
+    <!-- ============ SLIDE 21 — RISKS & MITIGATIONS (LIGHT) ============ -->
+    <section class="slide slide-light slide-pad bg-dots" data-sec="Mobilize" style="background:#FAF9FE;">
+      <p class="kicker text-primary mb-2">De-risking</p>
+      <h2 class="font-heading font-bold text-[34px] text-ink mb-5">Risks &amp; how we mitigate them</h2>
       <div class="grid grid-cols-2 gap-5">
-        <div class="card rounded-xl bg-white p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">CIDR exhaustion / overlap</h3><span class="chip bg-coral/10 text-coral px-2.5 py-0.5 text-[11px]">High</span></div><p class="text-[13.5px] text-ink/70"><strong>Mitigate:</strong> validate the /22 against IPAM in discovery; reserve before peering.</p></div>
-        <div class="card rounded-xl bg-white p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Org-policy / VPC-SC blocks</h3><span class="chip bg-coral/10 text-coral px-2.5 py-0.5 text-[11px]">High</span></div><p class="text-[13.5px] text-ink/70"><strong>Mitigate:</strong> policy audit up front; pre-stage exceptions &amp; ingress rules.</p></div>
-        <div class="card rounded-xl bg-white p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">On-prem connectivity lead time</h3><span class="chip bg-amber/15 text-[#8a6200] px-2.5 py-0.5 text-[11px]">Medium</span></div><p class="text-[13.5px] text-ink/70"><strong>Mitigate:</strong> start Interconnect/VPN in week 1, parallel to provisioning.</p></div>
-        <div class="card rounded-xl bg-white p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Under-sizing / re-provision</h3><span class="chip bg-amber/15 text-[#8a6200] px-2.5 py-0.5 text-[11px]">Medium</span></div><p class="text-[13.5px] text-ink/70"><strong>Mitigate:</strong> design network &amp; env model for multi-region from day one.</p></div>
-        <div class="card rounded-xl bg-white p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Unclear day-2 ownership</h3><span class="chip bg-amber/15 text-[#8a6200] px-2.5 py-0.5 text-[11px]">Medium</span></div><p class="text-[13.5px] text-ink/70"><strong>Mitigate:</strong> name platform owner &amp; runbooks before go-live.</p></div>
-        <div class="card rounded-xl bg-white p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Input / approval delays</h3><span class="chip bg-secondary/10 text-secondary px-2.5 py-0.5 text-[11px]">Manageable</span></div><p class="text-[13.5px] text-ink/70"><strong>Mitigate:</strong> single client SPOC + the pre-requisites checklist.</p></div>
+        <div class="card p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">CIDR exhaustion / overlap</h3><span class="text-coral bg-coral/10 px-2.5 py-0.5 text-[11px] rounded-full font-semibold">High</span></div><p class="text-[13px] text-ink/70"><strong>Mitigate:</strong> validate the /22 against IPAM in discovery; consider PSC no-peering; reserve before peering.</p></div>
+        <div class="card p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Org-policy / VPC-SC blocks</h3><span class="text-coral bg-coral/10 px-2.5 py-0.5 text-[11px] rounded-full font-semibold">High</span></div><p class="text-[13px] text-ink/70"><strong>Mitigate:</strong> policy audit up front; pre-stage exceptions, ingress/egress rules &amp; access levels.</p></div>
+        <div class="card p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">On-prem connectivity lead time</h3><span class="text-amber bg-amber/15 px-2.5 py-0.5 text-[11px] rounded-full font-semibold">Medium</span></div><p class="text-[13px] text-ink/70"><strong>Mitigate:</strong> start Interconnect/VPN in week 1, parallel to provisioning.</p></div>
+        <div class="card p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Under-sizing / re-provision</h3><span class="text-amber bg-amber/15 px-2.5 py-0.5 text-[11px] rounded-full font-semibold">Medium</span></div><p class="text-[13px] text-ink/70"><strong>Mitigate:</strong> design network &amp; environment model for multi-region from day one.</p></div>
+        <div class="card p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Unclear day-2 ownership</h3><span class="text-amber bg-amber/15 px-2.5 py-0.5 text-[11px] rounded-full font-semibold">Medium</span></div><p class="text-[13px] text-ink/70"><strong>Mitigate:</strong> name platform owner &amp; runbooks before go-live.</p></div>
+        <div class="card p-5"><div class="flex justify-between items-start mb-1"><h3 class="font-heading font-semibold text-[15px] text-ink">Input / approval delays</h3><span class="text-secondary bg-secondary/10 px-2.5 py-0.5 text-[11px] rounded-full font-semibold">Manageable</span></div><p class="text-[13px] text-ink/70"><strong>Mitigate:</strong> single client SPOC + the pre-requisites checklist.</p></div>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Frame risk positively — these are known, with proven mitigations. The recurring theme: the platform work is well-trodden; timeline risk lives in the client's inputs and approvals, which the checklist and a single SPOC neutralize.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Frame positively — these are known risks with proven mitigations. The recurring theme: the platform work is well-trodden; timeline risk lives in the client's inputs and approvals, which the checklist and a single SPOC neutralize.</aside>
     </section>
 
-    <!-- ============ SLIDE 20 — NEXT STEPS / CLOSE (DARK) ============ -->
-    <section class="slide slide-dark slide-pad bg-grid-dark" style="background:radial-gradient(1100px 600px at 80% 25%, #2a1d63 0%, #150E2E 55%, #0c0820 100%);">
-      <p class="eyebrow text-[12px] text-amber mb-3">Next steps</p>
-      <h2 class="font-heading font-extrabold text-white text-[46px] leading-tight mb-8 max-w-4xl">Let's turn the blueprint into a live pilot</h2>
-      <div class="grid grid-cols-3 gap-6 max-w-5xl">
-        <div class="rounded-2xl p-6 border border-white/12 bg-white/[0.06]">
-          <div class="zbadge w-10 h-10 rounded-xl text-white mb-3" style="background:#5B3FD6;">1</div>
-          <h3 class="font-heading font-semibold text-white text-[17px] mb-2">Complete the checklist</h3>
-          <p class="text-white/65 text-[14px]">We share the pre-requisites sheet; you nominate a SPOC to return inputs.</p>
-        </div>
-        <div class="rounded-2xl p-6 border border-white/12 bg-white/[0.06]">
-          <div class="zbadge w-10 h-10 rounded-xl text-white mb-3" style="background:#1A73E8;">2</div>
-          <h3 class="font-heading font-semibold text-white text-[17px] mb-2">Discovery workshop</h3>
-          <p class="text-white/65 text-[14px]">Lock CIDR, policies, regions &amp; sizing; produce the costed design.</p>
-        </div>
-        <div class="rounded-2xl p-6 border border-white/12 bg-white/[0.06]">
-          <div class="zbadge w-10 h-10 rounded-xl text-white mb-3" style="background:#34A853;">3</div>
-          <h3 class="font-heading font-semibold text-white text-[17px] mb-2">Build the pilot</h3>
-          <p class="text-white/65 text-[14px]">Provision Z1–Z7 and take your first API proxy live in ~6–8 weeks.</p>
-        </div>
+    <!-- ============ SLIDE 22 — NEXT STEPS / CLOSE (DARK) ============ -->
+    <section class="slide slide-dark slide-pad bg-grid-dark" data-sec="Close" style="background:radial-gradient(1100px 620px at 82% 22%, #2c1f6a 0%, #160F31 54%, #0c0820 100%);">
+      <div class="blob" style="width:360px;height:360px;background:#5B3FD6;top:-100px;left:6%;opacity:.4;"></div>
+      <div class="blob" style="width:300px;height:300px;background:#1A73E8;bottom:-80px;right:8%;opacity:.32;"></div>
+      <p class="kicker text-amber mb-3 relative z-10">Next steps</p>
+      <h2 class="font-heading font-extrabold text-white text-[46px] leading-tight mb-8 max-w-4xl relative z-10">Let's turn the blueprint into a live pilot</h2>
+      <div class="grid grid-cols-3 gap-6 max-w-5xl relative z-10">
+        <div class="glass p-6"><div class="zicon w-11 h-11 text-white mb-3" style="background:#5B3FD6;"><svg class="ico ico-sm"><use href="#ic-list"/></svg></div><h3 class="font-heading font-semibold text-white text-[17px] mb-2">Complete the checklist</h3><p class="text-white/65 text-[14px]">We share the pre-requisites sheet; you nominate a SPOC to return inputs.</p></div>
+        <div class="glass p-6"><div class="zicon w-11 h-11 text-white mb-3" style="background:#1A73E8;"><svg class="ico ico-sm"><use href="#ic-network"/></svg></div><h3 class="font-heading font-semibold text-white text-[17px] mb-2">Discovery workshop</h3><p class="text-white/65 text-[14px]">Lock CIDR, policies, regions &amp; sizing; produce the costed design.</p></div>
+        <div class="glass p-6"><div class="zicon w-11 h-11 text-white mb-3" style="background:#34A853;"><svg class="ico ico-sm"><use href="#ic-bolt"/></svg></div><h3 class="font-heading font-semibold text-white text-[17px] mb-2">Build the pilot</h3><p class="text-white/65 text-[14px]">Provision Z1–Z7 and take your first API proxy live in ~6–8 weeks.</p></div>
       </div>
-      <div class="absolute bottom-9 left-[5vw] right-[5vw] flex items-center justify-between border-t border-white/10 pt-5">
+      <div class="absolute bottom-9 left-[5vw] right-[5vw] flex items-center justify-between border-t border-white/10 pt-5 z-10">
         <span class="text-white/75 font-heading font-semibold text-[16px]">Thank you — questions?</span>
         <span class="text-white/40 text-[13px]">Apigee X on a GCP Enterprise Landing Zone · Setup Blueprint &amp; Checklist</span>
       </div>
-      <aside class="speaker-notes"><strong>Speaker notes:</strong> Close with a concrete ask: agree a date for the discovery workshop and confirm their SPOC before leaving the room. Reiterate the 6–8 week pilot is achievable once inputs land. Open the floor for questions.</aside>
+      <aside class="speaker-notes"><strong>Speaker notes:</strong> Close with a concrete ask: agree a date for the discovery workshop and confirm their SPOC before leaving the room. Reiterate the 6–8 week pilot is achievable once inputs land. Open the floor.</aside>
     </section>
 
   </div><!-- /slides-track -->
 </div><!-- /presentation-container -->
 
-<!-- HUD: counter + notes toggle -->
+<!-- top progress rail -->
+<div id="rail" class="no-print" style="width:0;"></div>
+
+<!-- HUD -->
 <div id="hud" class="no-print" style="top:16px; right:18px; display:flex; gap:8px; align-items:center;">
   <button id="notesBtn" class="ctrlbtn no-nav text-[12px] font-semibold px-3 py-1.5 rounded-full bg-white/70 text-ink border border-primary/20 hover:bg-white">Notes</button>
-  <div class="ctrlbtn text-[12px] font-semibold px-3 py-1.5 rounded-full bg-white/70 text-ink border border-primary/20"><span id="counter">1</span> / <span id="total">20</span></div>
+  <div class="ctrlbtn text-[12px] font-semibold px-3 py-1.5 rounded-full bg-white/70 text-ink border border-primary/20"><span id="counter">1</span> / <span id="total">22</span></div>
 </div>
 
-<!-- Slide indicator -->
+<!-- indicator -->
 <div id="indicator" class="no-print"></div>
 
-<!-- Hint -->
-<div class="no-print" style="position:fixed; bottom:16px; right:18px; z-index:50;">
+<!-- hint -->
+<div class="no-print" style="position:fixed; bottom:14px; right:18px; z-index:50;">
   <span class="text-[11px] text-ink/40">← → / Space · click sides · N = notes</span>
 </div>
 
@@ -813,30 +889,38 @@
 
   document.getElementById('total').textContent = total;
 
-  // Build indicator dots: o - o - * - o - o
+  // Inject per-slide footer chrome (prints too)
+  slides.forEach((s, i) => {
+    const dark = s.classList.contains('slide-dark');
+    const foot = document.createElement('div');
+    foot.className = 'slide-foot ' + (dark ? 'foot-dark' : 'foot-light');
+    const sec = s.dataset.sec || '';
+    foot.innerHTML = '<span class="fl"><span class="pip"></span>' + sec + '</span>' +
+                     '<span>' + String(i+1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0') + '</span>';
+    s.appendChild(foot);
+  });
+
+  // Build indicator dots
   const indicator = document.getElementById('indicator');
   slides.forEach((_, i) => {
     if (i > 0) { const d = document.createElement('span'); d.className = 'dash'; indicator.appendChild(d); }
     const dot = document.createElement('span'); dot.className = 'dot'; dot.dataset.i = i; indicator.appendChild(dot);
   });
   const dots = Array.from(indicator.querySelectorAll('.dot'));
+  const rail = document.getElementById('rail');
 
   function updateUI(){
     document.getElementById('counter').textContent = current + 1;
     dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    rail.style.width = ((current + 1) / total * 100) + 'vw';
   }
 
   function setX(animate){
     const x = -current * window.innerWidth;
     if (animate){
       isAnimating = true;
-      anime({
-        targets: track,
-        translateX: x,
-        duration: 560,
-        easing: 'easeInOutQuart',
-        complete: () => { isAnimating = false; }
-      });
+      anime({ targets: track, translateX: x, duration: 560, easing: 'easeInOutQuart',
+              complete: () => { isAnimating = false; } });
     } else {
       track.style.transform = 'translateX(' + x + 'px)';
     }
@@ -845,9 +929,7 @@
   function goTo(i){
     if (isAnimating) return;
     if (i < 0 || i >= total) return;
-    current = i;
-    setX(true);
-    updateUI();
+    current = i; setX(true); updateUI();
   }
   const next = () => goTo(current + 1);
   const prev = () => goTo(current - 1);
